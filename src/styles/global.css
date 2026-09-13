@@ -35,8 +35,6 @@
 
 *, *::before, *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
@@ -57,14 +55,6 @@ body {
 .tnum, [data-tnum] {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
-}
-
-/* Containers */
-.container {
-  width: 100%;
-  max-width: 1120px;
-  margin-inline: auto;
-  padding-inline: 16px;
 }
 
 /* Interactive Sliders */
@@ -98,55 +88,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
   box-shadow: 0 3px 8px rgba(15, 118, 110, 0.45);
 }
 
-/* Ad Unit Containers (Eliminates CLS) */
+/* Ad Unit Containers (Clean & Unobtrusive) */
 .ad-slot-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-block: 24px;
+  margin-block: 20px;
   text-align: center;
+  min-height: 0;
 }
 
-.ad-slot-card {
-  width: 100%;
-  background: var(--surface);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100px;
-  overflow: hidden;
+.ad-slot-wrapper:has(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none !important;
 }
 
-.ad-label {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 6px;
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
 }
-
-/* Utilities */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.badge-brand { background: var(--brand-tint); color: var(--brand); border: 1px solid rgba(15, 118, 110, 0.2); }
-.badge-emerald { background: var(--emerald-tint); color: var(--emerald); border: 1px solid rgba(5, 150, 105, 0.2); }
-.badge-rose { background: var(--rose-tint); color: var(--rose); border: 1px solid rgba(225, 29, 72, 0.2); }
 
 /* Print Media */
 @media print {
