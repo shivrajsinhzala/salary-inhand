@@ -33,6 +33,13 @@ const ogImage = `${siteUrl}/og-image.png`;
   <link rel="canonical" href={finalCanonical} />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
+  <!-- Canonical Domain Redirect (pages.dev -> salary.shivrajsinh.in) -->
+  <script is:inline>
+    if (window.location.hostname.endsWith('.pages.dev')) {
+      window.location.replace('https://salary.shivrajsinh.in' + window.location.pathname + window.location.search + window.location.hash);
+    }
+  </script>
+
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7164999486301748" crossorigin="anonymous"></script>
 
