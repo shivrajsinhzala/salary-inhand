@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="Calculation Methodology & Legal Sources — InHand."
+  description="Verification and statutory methodology behind InHand's income tax, salary, EPF, and gratuity calculations."
+  canonicalUrl="https://salary.shivrajsinh.in/methodology/"
+>
+  <div class="container max-w-3xl py-8">
+    <h1 class="text-3xl font-extrabold text-slate-900 mb-4">Calculation Methodology & Sources</h1>
+    <p class="text-xs text-slate-400 mb-8">Verified against Central Board of Direct Taxes (CBDT) & Ministry of Labour guidelines</p>
+
+    <div class="prose prose-slate text-sm space-y-6 text-slate-700 leading-relaxed">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">1. Income Tax Calculations</h2>
+        <p>
+          Calculations reflect the amendments introduced under the <strong>Finance Act, 2024 / 2025</strong> under Section 115BAC of the Income Tax Act, 1961.
+        </p>
+        <ul class="list-disc pl-5 space-y-1 mt-2 text-xs">
+          <li><strong>Standard Deduction:</strong> ₹75,000 for salaried individuals under Section 16(ia) in the New Regime (₹50,000 under the Old Regime).</li>
+          <li><strong>Section 87A Tax Rebate:</strong> Full rebate up to ₹25,000 for resident individuals with taxable income up to ₹7,00,000 under the New Regime (effective tax = ₹0 for gross salary up to ₹7,75,000).</li>
+          <li><strong>Health and Education Cess:</strong> 4% levied on aggregate of income tax and surcharge.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">2. Employees' Provident Fund (EPF)</h2>
+        <p>
+          Governed by the Employees' Provident Funds and Miscellaneous Provisions Act, 1952.
+        </p>
+        <ul class="list-disc pl-5 space-y-1 mt-2 text-xs">
+          <li><strong>Contribution:</strong> 12% of basic wage by employee and 12% by employer.</li>
+          <li><strong>Wage Ceiling:</strong> The statutory wage ceiling is ₹15,000/month (producing minimum ₹1,800/month contribution), though most private employers contribute on actual basic pay unless opted out.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">3. Payment of Gratuity</h2>
+        <p>
+          Governed by the Payment of Gratuity Act, 1972.
+        </p>
+        <p class="text-xs mt-1">
+          Calculated using the statutory formula: <code>(15 × Last Drawn Basic Salary × Tenor in Years) / 26</code>. For annual CTC decomposition, standard actuarial allocation is <code>(15 / 26) × (Basic / 12)</code> per year (approx 4.81% of basic salary).
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">4. State Professional Tax (PT)</h2>
+        <p>
+          Enacted under Article 276 of the Indian Constitution, capped at a maximum of ₹2,500 per annum per state. Rules for Gujarat, Maharashtra, Karnataka, Telangana, Tamil Nadu, and non-PT states (Delhi, UP, Rajasthan, Haryana) are modeled directly on their respective state gazettes.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

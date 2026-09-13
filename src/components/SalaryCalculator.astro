@@ -1,0 +1,659 @@
+---
+import { calculateSalaryBreakdown } from '../lib/math/salary.js';
+import { formatINR, formatLakhs } from '../lib/format.js';
+
+interface Props {
+  initialCtc?: number;
+  initialRegime?: 'new' | 'old';
+  initialState?: string;
+  heading?: string;
+  subheading?: string;
+}
+
+const {
+  initialCtc = 1200000,
+  initialRegime = 'new',
+  initialState = 'gujarat',
+  heading = 'In-Hand Salary Calculator (FY 2025–26 & FY 2026–27)',
+  subheading = 'Calculate your exact monthly take-home salary, PF, professional tax, and new vs old tax regime savings in seconds.'
+} = Astro.props;
+
+// Initial pre-rendered calculation for instant server-rendered HTML (0s blank time, instant SEO)
+const initialData = calculateSalaryBreakdown({
+  ctc: initialCtc,
+  basicPercent: 50,
+  epfCap: false,
+  state: initialState,
+  regime: initialRegime
+});
+---
+<div class="salary-calc-root" data-initial-ctc={initialCtc} data-initial-regime={initialRegime} data-initial-state={initialState}>
+  <!-- Header Area -->
+  <div class="mb-8">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 mb-3 border border-slate-200">
+      <span class="text-teal-700">●</span> Verified against Union Budget 2024–2025 & Finance Act Slabs
+    </div>
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+      {heading}
+    </h1>
+    <p class="mt-2 text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
+      {subheading}
+    </p>
+  </div>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Left Column: Controls (7 Cols) -->
+    <div class="lg:col-span-7 space-y-6">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+        <!-- CTC Input -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="ctc-input" class="text-sm font-bold text-slate-900">
+              Annual CTC (Cost to Company)
+            </label>
+            <span id="ctc-lakhs-label" class="text-xs font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200/50 tnum">
+              {formatLakhs(initialCtc)}
+            </span>
+          </div>
+          
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 font-semibold text-base pointer-events-none">₹</span>
+            <input 
+              type="number" 
+              id="ctc-input" 
+              value={initialCtc} 
+              min="100000" 
+              max="50000000" 
+              step="10000"
+              class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 text-lg font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent tnum bg-slate-50/50"
+            />
+          </div>
+
+          <!-- Slider -->
+          <div class="mt-4">
+            <input 
+              type="range" 
+              id="ctc-slider" 
+              min="200000" 
+              max="5000000" 
+              step="25000" 
+              value={initialCtc > 5000000 ? 5000000 : initialCtc}
+              class="w-full"
+            />
+            <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-medium tnum">
+              <span>₹2 Lakh</span>
+              <span>₹10 Lakh</span>
+              <span>₹25 Lakh</span>
+              <span>₹50 Lakh+</span>
+            </div>
+          </div>
+
+          <!-- Quick LPA Jump Pills -->
+          <div class="flex flex-wrap gap-1.5 mt-3">
+            {[300000, 600000, 800000, 1000000, 1200000, 1500000, 2000000, 2500000, 3000000, 5000000].map(val => (
+              <button 
+                type="button" 
+                data-ctc-pill={val}
+                class={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors border ${val === initialCtc ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+              >
+                {val >= 10000000 ? `${val/10000000} Cr` : `${val/100000}L`}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Tax Regime Switcher -->
+        <div class="pt-5 border-t border-slate-100">
+          <label class="block text-sm font-bold text-slate-900 mb-2.5">
+            Tax Regime
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="cursor-pointer">
+              <input type="radio" name="regime-toggle" value="new" checked={initialRegime === 'new'} class="peer sr-only" />
+              <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 peer-checked:bg-teal-50/70 peer-checked:border-teal-600 peer-checked:ring-1 peer-checked:ring-teal-600 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-bold text-slate-900">New Regime</span>
+                  <span class="text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded bg-teal-600 text-white">Default</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">₹75k Standard Deduction + ₹7L zero tax slab (§87A)</p>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="regime-toggle" value="old" checked={initialRegime === 'old'} class="peer sr-only" />
+              <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 peer-checked:bg-teal-50/70 peer-checked:border-teal-600 peer-checked:ring-1 peer-checked:ring-teal-600 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-bold text-slate-900">Old Regime</span>
+                  <span class="text-[10px] uppercase tracking-wide font-medium px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">Deductions</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">Section 80C, 80D, HRA & home loan deductions</p>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- State Selector for Professional Tax -->
+        <div class="pt-5 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="state-select" class="block text-sm font-bold text-slate-900 mb-1.5">
+              State (Professional Tax)
+            </label>
+            <select 
+              id="state-select" 
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-teal-600"
+            >
+              <option value="gujarat" selected={initialState === 'gujarat'}>Gujarat (₹200/mo)</option>
+              <option value="maharashtra" selected={initialState === 'maharashtra'}>Maharashtra (₹200/mo)</option>
+              <option value="karnataka" selected={initialState === 'karnataka'}>Karnataka (₹200/mo)</option>
+              <option value="telangana" selected={initialState === 'telangana'}>Telangana (₹200/mo)</option>
+              <option value="tamilnadu" selected={initialState === 'tamilnadu'}>Tamil Nadu (₹208/mo)</option>
+              <option value="delhi" selected={initialState === 'delhi'}>Delhi (₹0 No PT)</option>
+              <option value="haryana" selected={initialState === 'haryana'}>Haryana (₹0 No PT)</option>
+              <option value="uttarpradesh" selected={initialState === 'uttarpradesh'}>Uttar Pradesh (₹0 No PT)</option>
+              <option value="rajasthan" selected={initialState === 'rajasthan'}>Rajasthan (₹0 No PT)</option>
+              <option value="other" selected={initialState === 'other'}>Other State (₹200/mo standard)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="basic-percent-select" class="block text-sm font-bold text-slate-900 mb-1.5">
+              Basic Salary %
+            </label>
+            <select 
+              id="basic-percent-select" 
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-teal-600"
+            >
+              <option value="50" selected>50% of CTC (Standard / Wage Code)</option>
+              <option value="40">40% of CTC (Common in Tech/Startups)</option>
+              <option value="35">35% of CTC</option>
+              <option value="60">60% of CTC</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Advanced Options Toggle (EPF Cap & Old Regime Deductions) -->
+        <div class="pt-4 border-t border-slate-100">
+          <details class="group">
+            <summary class="flex items-center justify-between text-xs font-semibold text-slate-600 cursor-pointer hover:text-teal-700 select-none">
+              <span>Advanced: Statutory EPF Cap & Itemized Deductions</span>
+              <span class="transition-transform group-open:rotate-180">▼</span>
+            </summary>
+            
+            <div class="mt-4 pt-3 space-y-4 border-t border-slate-100">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" id="epf-cap-checkbox" class="mt-1 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300" />
+                <span class="text-xs text-slate-600 leading-relaxed">
+                  <strong class="text-slate-800">Cap EPF at Statutory Minimum (₹1,800/month)</strong><br />
+                  Select this if your employer only deducts PF on ₹15,000 wage ceiling rather than full basic pay.
+                </span>
+              </label>
+
+              <div id="old-regime-deductions-box" class="space-y-3 pt-3 border-t border-slate-100">
+                <p class="text-xs font-bold text-slate-700">Old Regime Deductions (Optional):</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-500 mb-1">Section 80C (Max ₹1.5L)</label>
+                    <input type="number" id="sec80c-input" placeholder="0" max="150000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs tnum" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-500 mb-1">Section 80D Health Ins.</label>
+                    <input type="number" id="sec80d-input" placeholder="0" max="50000" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs tnum" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-500 mb-1">HRA Exemption / Rent</label>
+                    <input type="number" id="hra-input" placeholder="0" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs tnum" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Live In-Hand Summary Card (5 Cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden border border-slate-800">
+        <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex items-center justify-between text-xs font-semibold text-teal-400 uppercase tracking-wider mb-2">
+          <span>Monthly Take-Home</span>
+          <span id="regime-badge" class="px-2 py-0.5 rounded-full bg-teal-950/80 border border-teal-500/30 text-teal-300">
+            {initialRegime === 'new' ? 'New Tax Regime' : 'Old Tax Regime'}
+          </span>
+        </div>
+
+        <!-- Big Metric -->
+        <div class="flex items-baseline gap-2 mt-1">
+          <span id="monthly-inhand-display" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight tnum">
+            {formatINR(initialData.monthlyTakeHome)}
+          </span>
+          <span class="text-sm font-medium text-slate-400">/ month</span>
+        </div>
+
+        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
+          <span>Annual In-Hand:</span>
+          <strong id="annual-inhand-display" class="text-slate-200 font-bold tnum">
+            {formatINR(initialData.annualTakeHome)}
+          </strong>
+        </p>
+
+        <!-- Proportional Visual Distribution Bar -->
+        <div class="mt-6 pt-5 border-t border-slate-800/80">
+          <div class="flex justify-between text-xs font-medium text-slate-300 mb-2">
+            <span>CTC Distribution</span>
+            <span id="takehome-percent-display" class="font-bold text-emerald-400 tnum">{initialData.percentages.takeHome}% in-hand</span>
+          </div>
+
+          <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex">
+            <div id="bar-takehome" class="bg-emerald-500 h-full transition-all duration-300" style={`width: ${initialData.percentages.takeHome}%`}></div>
+            <div id="bar-pf" class="bg-indigo-500 h-full transition-all duration-300" style={`width: ${initialData.percentages.retirement}%`}></div>
+            <div id="bar-tax" class="bg-rose-500 h-full transition-all duration-300" style={`width: ${initialData.percentages.tax}%`}></div>
+            <div id="bar-pt" class="bg-amber-500 h-full transition-all duration-300" style={`width: ${initialData.percentages.pt}%`}></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400 mt-3 pt-2">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span>In-Hand (<span id="legend-takehome" class="tnum">{initialData.percentages.takeHome}%</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span>PF & Gratuity (<span id="legend-pf" class="tnum">{initialData.percentages.retirement}%</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span>Income Tax (<span id="legend-tax" class="tnum">{initialData.percentages.tax}%</span>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Prof. Tax (<span id="legend-pt" class="tnum">{initialData.percentages.pt}%</span>)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Banner -->
+        <div id="regime-recommendation-box" class="mt-5 p-3 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs text-slate-300 flex items-start gap-2.5">
+          <span class="text-base">💡</span>
+          <p id="regime-recommendation-text" class="leading-relaxed">
+            {initialData.taxSavingsWithNew >= 0 
+              ? `New Tax Regime saves you ₹${initialData.taxSavingsWithNew.toLocaleString('en-IN')} in tax compared to Old Regime.` 
+              : `Old Tax Regime saves you ₹${Math.abs(initialData.taxSavingsWithNew).toLocaleString('en-IN')} with your deductions.`}
+          </p>
+        </div>
+
+        <!-- Action Button: Print / Payslip -->
+        <button 
+          type="button" 
+          id="print-payslip-btn"
+          class="w-full mt-5 py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm"
+        >
+          <span>📄</span>
+          <span>Print / Download Payslip Breakdown</span>
+        </button>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-2 gap-3 text-slate-800">
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Monthly Gross</span>
+          <span id="monthly-gross-display" class="text-lg font-bold text-slate-900 tnum">
+            {formatINR(initialData.monthlyGross)}
+          </span>
+          <span class="text-[11px] text-slate-400 block mt-0.5">before employee cuts</span>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Monthly Tax (TDS)</span>
+          <span id="monthly-tax-display" class="text-lg font-bold text-rose-600 tnum">
+            {formatINR(initialData.monthlyTax)}
+          </span>
+          <span class="text-[11px] text-slate-400 block mt-0.5">effective monthly deduction</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Audit Breakdown Table (Full Width) -->
+  <div class="mt-12 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Detailed CTC Audit Breakdown</h2>
+        <p class="text-xs text-slate-500">Every rupee accounted for between annual CTC and monthly net bank credit.</p>
+      </div>
+      <span class="text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/50">
+        Statutory Accurate
+      </span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50/80 text-xs font-bold text-slate-600 border-b border-slate-200 uppercase tracking-wider">
+          <tr>
+            <th class="py-3.5 px-5">Component</th>
+            <th class="py-3.5 px-5">Rule / Category</th>
+            <th class="py-3.5 px-5 text-right">Monthly Amount</th>
+            <th class="py-3.5 px-5 text-right">Annual Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-slate-700">
+          <tr class="font-bold text-slate-900 bg-slate-50/30">
+            <td class="py-3 px-5">Annual CTC</td>
+            <td class="py-3 px-5 font-normal text-xs text-slate-500">Total Employer Cost</td>
+            <td id="tbl-monthly-ctc" class="py-3 px-5 text-right tnum">{formatINR(initialData.monthlyCtc)}</td>
+            <td id="tbl-annual-ctc" class="py-3 px-5 text-right tnum">{formatINR(initialData.annualCtc)}</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5 text-slate-600">− Employer EPF</td>
+            <td class="py-3 px-5 text-xs text-slate-400">12% of Basic (Retirement benefit)</td>
+            <td id="tbl-monthly-emp-pf" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.monthlyEmployerPF)}</td>
+            <td id="tbl-annual-emp-pf" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.employerPF)}</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5 text-slate-600">− Gratuity</td>
+            <td class="py-3 px-5 text-xs text-slate-400">15/26 of monthly basic / 12 (Statutory)</td>
+            <td id="tbl-monthly-gratuity" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.monthlyGratuity)}</td>
+            <td id="tbl-annual-gratuity" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.gratuity)}</td>
+          </tr>
+          <tr class="font-semibold text-slate-900 bg-teal-50/20">
+            <td class="py-3 px-5">= Cash Gross Salary</td>
+            <td class="py-3 px-5 font-normal text-xs text-slate-500">Base for TDS & Employee deductions</td>
+            <td id="tbl-monthly-gross" class="py-3 px-5 text-right tnum">{formatINR(initialData.monthlyGross)}</td>
+            <td id="tbl-annual-gross" class="py-3 px-5 text-right tnum">{formatINR(initialData.cashGross)}</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5 text-slate-600">− Employee EPF</td>
+            <td class="py-3 px-5 text-xs text-slate-400">12% of Basic (Employee share)</td>
+            <td id="tbl-monthly-ee-pf" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.monthlyEmployeePF)}</td>
+            <td id="tbl-annual-ee-pf" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.employeePF)}</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5 text-slate-600">− Professional Tax (PT)</td>
+            <td class="py-3 px-5 text-xs text-slate-400">State Municipal Levy</td>
+            <td id="tbl-monthly-pt" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.monthlyPT)}</td>
+            <td id="tbl-annual-pt" class="py-3 px-5 text-right text-slate-500 tnum">− {formatINR(initialData.annualPT)}</td>
+          </tr>
+          <tr>
+            <td class="py-3 px-5 text-rose-700">− Income Tax (TDS)</td>
+            <td id="tbl-tax-rule" class="py-3 px-5 text-xs text-slate-400">
+              {initialRegime === 'new' ? 'New Regime (Standard deduction ₹75,000)' : 'Old Regime'}
+            </td>
+            <td id="tbl-monthly-tax" class="py-3 px-5 text-right text-rose-700 font-medium tnum">− {formatINR(initialData.monthlyTax)}</td>
+            <td id="tbl-annual-tax" class="py-3 px-5 text-right text-rose-700 font-medium tnum">− {formatINR(initialData.annualTax)}</td>
+          </tr>
+          <tr class="font-extrabold text-base bg-emerald-50/40 text-emerald-950 border-t-2 border-slate-200">
+            <td class="py-4 px-5">= Net Take-Home (In-Hand)</td>
+            <td class="py-4 px-5 font-semibold text-xs text-emerald-700">Credited directly to Bank Account</td>
+            <td id="tbl-monthly-final" class="py-4 px-5 text-right text-emerald-700 tnum">{formatINR(initialData.monthlyTakeHome)}</td>
+            <td id="tbl-annual-final" class="py-4 px-5 text-right text-emerald-700 tnum">{formatINR(initialData.annualTakeHome)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Side-by-Side Tax Regime Comparison Table -->
+  <div class="mt-10 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+    <div class="mb-5">
+      <h2 class="text-lg font-bold text-slate-900">New Regime vs Old Regime Comparison</h2>
+      <p class="text-xs text-slate-500">See which tax regime leaves more money in your pocket.</p>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-slate-50 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+          <tr>
+            <th class="py-3 px-4">Parameter</th>
+            <th class="py-3 px-4 text-right">New Tax Regime</th>
+            <th class="py-3 px-4 text-right">Old Tax Regime</th>
+            <th class="py-3 px-4 text-right">Difference</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr>
+            <td class="py-2.5 px-4 font-medium text-slate-700">Standard Deduction</td>
+            <td class="py-2.5 px-4 text-right font-semibold text-teal-700 tnum">₹75,000</td>
+            <td class="py-2.5 px-4 text-right text-slate-600 tnum">₹50,000</td>
+            <td class="py-2.5 px-4 text-right text-emerald-600 font-medium tnum">+ ₹25,000</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 px-4 font-medium text-slate-700">Taxable Income</td>
+            <td id="cmp-taxable-new" class="py-2.5 px-4 text-right text-slate-600 tnum">{formatINR(initialData.newRegimeTaxData.taxableIncome)}</td>
+            <td id="cmp-taxable-old" class="py-2.5 px-4 text-right text-slate-600 tnum">{formatINR(initialData.oldRegimeTaxData.taxableIncome)}</td>
+            <td id="cmp-taxable-diff" class="py-2.5 px-4 text-right text-slate-500 tnum">-</td>
+          </tr>
+          <tr>
+            <td class="py-2.5 px-4 font-medium text-slate-700">Total Tax Payable</td>
+            <td id="cmp-tax-new" class="py-2.5 px-4 text-right font-bold text-slate-900 tnum">{formatINR(initialData.newRegimeTax)}</td>
+            <td id="cmp-tax-old" class="py-2.5 px-4 text-right font-bold text-slate-900 tnum">{formatINR(initialData.oldRegimeTax)}</td>
+            <td id="cmp-tax-diff" class="py-2.5 px-4 text-right font-bold text-emerald-600 tnum">
+              {initialData.taxSavingsWithNew >= 0 ? `Save ₹${initialData.taxSavingsWithNew.toLocaleString('en-IN')}` : `Lose ₹${Math.abs(initialData.taxSavingsWithNew).toLocaleString('en-IN')}`}
+            </td>
+          </tr>
+          <tr class="bg-slate-50/70 font-bold">
+            <td class="py-3 px-4 text-slate-900">Monthly In-Hand</td>
+            <td id="cmp-inhand-new" class="py-3 px-4 text-right text-teal-800 tnum">
+              {formatINR(Math.round((initialData.cashGross - initialData.employeePF - initialData.annualPT - initialData.newRegimeTax) / 12))}
+            </td>
+            <td id="cmp-inhand-old" class="py-3 px-4 text-right text-slate-700 tnum">
+              {formatINR(Math.round((initialData.cashGross - initialData.employeePF - initialData.annualPT - initialData.oldRegimeTax) / 12))}
+            </td>
+            <td id="cmp-inhand-recommend" class="py-3 px-4 text-right text-emerald-700">
+              {initialData.taxSavingsWithNew >= 0 ? 'New is Better ✅' : 'Old is Better ✅'}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Reactive Client-Side Calculator Engine (Zero dependencies, instant response) -->
+<script>
+  import { calculateSalaryBreakdown } from '../lib/math/salary.js';
+  import { formatINR, formatLakhs } from '../lib/format.js';
+
+  function initCalculator() {
+    const root = document.querySelector('.salary-calc-root');
+    if (!root) return;
+
+    const ctcInput = document.getElementById('ctc-input');
+    const ctcSlider = document.getElementById('ctc-slider');
+    const ctcLakhsLabel = document.getElementById('ctc-lakhs-label');
+    const stateSelect = document.getElementById('state-select');
+    const basicSelect = document.getElementById('basic-percent-select');
+    const epfCapCheckbox = document.getElementById('epf-cap-checkbox');
+    const sec80cInput = document.getElementById('sec80c-input');
+    const sec80dInput = document.getElementById('sec80d-input');
+    const hraInput = document.getElementById('hra-input');
+    const printBtn = document.getElementById('print-payslip-btn');
+
+    const monthlyInHandDisp = document.getElementById('monthly-inhand-display');
+    const annualInHandDisp = document.getElementById('annual-inhand-display');
+    const takeHomePctDisp = document.getElementById('takehome-percent-display');
+    const monthlyGrossDisp = document.getElementById('monthly-gross-display');
+    const monthlyTaxDisp = document.getElementById('monthly-tax-display');
+    const regimeBadge = document.getElementById('regime-badge');
+    const recommendationText = document.getElementById('regime-recommendation-text');
+
+    // Bar elements
+    const barTakeHome = document.getElementById('bar-takehome');
+    const barPF = document.getElementById('bar-pf');
+    const barTax = document.getElementById('bar-tax');
+    const barPT = document.getElementById('bar-pt');
+    const legendTakehome = document.getElementById('legend-takehome');
+    const legendPf = document.getElementById('legend-pf');
+    const legendTax = document.getElementById('legend-tax');
+    const legendPt = document.getElementById('legend-pt');
+
+    // Table elements
+    const tblMonthlyCtc = document.getElementById('tbl-monthly-ctc');
+    const tblAnnualCtc = document.getElementById('tbl-annual-ctc');
+    const tblMonthlyEmpPf = document.getElementById('tbl-monthly-emp-pf');
+    const tblAnnualEmpPf = document.getElementById('tbl-annual-emp-pf');
+    const tblMonthlyGratuity = document.getElementById('tbl-monthly-gratuity');
+    const tblAnnualGratuity = document.getElementById('tbl-annual-gratuity');
+    const tblMonthlyGross = document.getElementById('tbl-monthly-gross');
+    const tblAnnualGross = document.getElementById('tbl-annual-gross');
+    const tblMonthlyEePf = document.getElementById('tbl-monthly-ee-pf');
+    const tblAnnualEePf = document.getElementById('tbl-annual-ee-pf');
+    const tblMonthlyPt = document.getElementById('tbl-monthly-pt');
+    const tblAnnualPt = document.getElementById('tbl-annual-pt');
+    const tblMonthlyTax = document.getElementById('tbl-monthly-tax');
+    const tblAnnualTax = document.getElementById('tbl-annual-tax');
+    const tblMonthlyFinal = document.getElementById('tbl-monthly-final');
+    const tblAnnualFinal = document.getElementById('tbl-annual-final');
+    const tblTaxRule = document.getElementById('tbl-tax-rule');
+
+    // Comparison elements
+    const cmpTaxableNew = document.getElementById('cmp-taxable-new');
+    const cmpTaxableOld = document.getElementById('cmp-taxable-old');
+    const cmpTaxNew = document.getElementById('cmp-tax-new');
+    const cmpTaxOld = document.getElementById('cmp-tax-old');
+    const cmpTaxDiff = document.getElementById('cmp-tax-diff');
+    const cmpInhandNew = document.getElementById('cmp-inhand-new');
+    const cmpInhandOld = document.getElementById('cmp-inhand-old');
+    const cmpInhandRecommend = document.getElementById('cmp-inhand-recommend');
+
+    function getSelectedRegime() {
+      const checked = document.querySelector('input[name="regime-toggle"]:checked');
+      return checked ? checked.value : 'new';
+    }
+
+    function recompute() {
+      const ctcVal = Math.max(100000, Number(ctcInput?.value) || 1200000);
+      const regimeVal = getSelectedRegime();
+      const stateVal = stateSelect?.value || 'gujarat';
+      const basicPct = Number(basicSelect?.value) || 50;
+      const isEpfCapped = epfCapCheckbox?.checked || false;
+
+      const deductions = {
+        sec80C: Number(sec80cInput?.value) || 0,
+        sec80D: Number(sec80dInput?.value) || 0,
+        hraExemption: Number(hraInput?.value) || 0
+      };
+
+      const result = calculateSalaryBreakdown({
+        ctc: ctcVal,
+        basicPercent: basicPct,
+        epfCap: isEpfCapped,
+        state: stateVal,
+        regime: regimeVal,
+        deductions
+      });
+
+      // Update Labels & Slider
+      if (ctcLakhsLabel) ctcLakhsLabel.textContent = formatLakhs(ctcVal);
+      if (ctcSlider && Number(ctcSlider.value) !== ctcVal && ctcVal <= 5000000) {
+        ctcSlider.value = String(ctcVal);
+      }
+
+      // Update Hero Metrics
+      if (monthlyInHandDisp) monthlyInHandDisp.textContent = formatINR(result.monthlyTakeHome);
+      if (annualInHandDisp) annualInHandDisp.textContent = formatINR(result.annualTakeHome);
+      if (takeHomePctDisp) takeHomePctDisp.textContent = `${result.percentages.takeHome}% in-hand`;
+      if (monthlyGrossDisp) monthlyGrossDisp.textContent = formatINR(result.monthlyGross);
+      if (monthlyTaxDisp) monthlyTaxDisp.textContent = formatINR(result.monthlyTax);
+      if (regimeBadge) regimeBadge.textContent = regimeVal === 'new' ? 'New Tax Regime' : 'Old Tax Regime';
+
+      // Update Visual Distribution Bar
+      if (barTakeHome) barTakeHome.style.width = `${result.percentages.takeHome}%`;
+      if (barPF) barPF.style.width = `${result.percentages.retirement}%`;
+      if (barTax) barTax.style.width = `${result.percentages.tax}%`;
+      if (barPT) barPT.style.width = `${result.percentages.pt}%`;
+
+      if (legendTakehome) legendTakehome.textContent = `${result.percentages.takeHome}%`;
+      if (legendPf) legendPf.textContent = `${result.percentages.retirement}%`;
+      if (legendTax) legendTax.textContent = `${result.percentages.tax}%`;
+      if (legendPt) legendPt.textContent = `${result.percentages.pt}%`;
+
+      // Recommendation box
+      if (recommendationText) {
+        if (result.taxSavingsWithNew >= 0) {
+          recommendationText.textContent = `New Tax Regime saves you ₹${result.taxSavingsWithNew.toLocaleString('en-IN')} in tax compared to Old Regime.`;
+        } else {
+          recommendationText.textContent = `Old Tax Regime saves you ₹${Math.abs(result.taxSavingsWithNew).toLocaleString('en-IN')} with your deductions.`;
+        }
+      }
+
+      // Audit Table
+      if (tblMonthlyCtc) tblMonthlyCtc.textContent = formatINR(result.monthlyCtc);
+      if (tblAnnualCtc) tblAnnualCtc.textContent = formatINR(result.annualCtc);
+      if (tblMonthlyEmpPf) tblMonthlyEmpPf.textContent = `− ${formatINR(result.monthlyEmployerPF)}`;
+      if (tblAnnualEmpPf) tblAnnualEmpPf.textContent = `− ${formatINR(result.employerPF)}`;
+      if (tblMonthlyGratuity) tblMonthlyGratuity.textContent = `− ${formatINR(result.monthlyGratuity)}`;
+      if (tblAnnualGratuity) tblAnnualGratuity.textContent = `− ${formatINR(result.gratuity)}`;
+      if (tblMonthlyGross) tblMonthlyGross.textContent = formatINR(result.monthlyGross);
+      if (tblAnnualGross) tblAnnualGross.textContent = formatINR(result.cashGross);
+      if (tblMonthlyEePf) tblMonthlyEePf.textContent = `− ${formatINR(result.monthlyEmployeePF)}`;
+      if (tblAnnualEePf) tblAnnualEePf.textContent = `− ${formatINR(result.employeePF)}`;
+      if (tblMonthlyPt) tblMonthlyPt.textContent = `− ${formatINR(result.monthlyPT)}`;
+      if (tblAnnualPt) tblAnnualPt.textContent = `− ${formatINR(result.annualPT)}`;
+      if (tblMonthlyTax) tblMonthlyTax.textContent = `− ${formatINR(result.monthlyTax)}`;
+      if (tblAnnualTax) tblAnnualTax.textContent = `− ${formatINR(result.annualTax)}`;
+      if (tblMonthlyFinal) tblMonthlyFinal.textContent = formatINR(result.monthlyTakeHome);
+      if (tblAnnualFinal) tblAnnualFinal.textContent = formatINR(result.annualTakeHome);
+      if (tblTaxRule) tblTaxRule.textContent = regimeVal === 'new' ? 'New Regime (Standard deduction ₹75,000)' : 'Old Regime with deductions';
+
+      // Comparison Table
+      if (cmpTaxableNew) cmpTaxableNew.textContent = formatINR(result.newRegimeTaxData.taxableIncome);
+      if (cmpTaxableOld) cmpTaxableOld.textContent = formatINR(result.oldRegimeTaxData.taxableIncome);
+      if (cmpTaxNew) cmpTaxNew.textContent = formatINR(result.newRegimeTax);
+      if (cmpTaxOld) cmpTaxOld.textContent = formatINR(result.oldRegimeTax);
+      if (cmpTaxDiff) {
+        cmpTaxDiff.textContent = result.taxSavingsWithNew >= 0 
+          ? `Save ₹${result.taxSavingsWithNew.toLocaleString('en-IN')}` 
+          : `Lose ₹${Math.abs(result.taxSavingsWithNew).toLocaleString('en-IN')}`;
+      }
+      const monthlyInhandNew = Math.round((result.cashGross - result.employeePF - result.annualPT - result.newRegimeTax) / 12);
+      const monthlyInhandOld = Math.round((result.cashGross - result.employeePF - result.annualPT - result.oldRegimeTax) / 12);
+      if (cmpInhandNew) cmpInhandNew.textContent = formatINR(monthlyInhandNew);
+      if (cmpInhandOld) cmpInhandOld.textContent = formatINR(monthlyInhandOld);
+      if (cmpInhandRecommend) {
+        cmpInhandRecommend.textContent = result.taxSavingsWithNew >= 0 ? 'New is Better ✅' : 'Old is Better ✅';
+      }
+    }
+
+    // Attach Event Listeners
+    ctcInput?.addEventListener('input', recompute);
+    ctcSlider?.addEventListener('input', (e) => {
+      if (ctcInput) ctcInput.value = (e.target as HTMLInputElement).value;
+      recompute();
+    });
+
+    document.querySelectorAll('[data-ctc-pill]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const val = (e.currentTarget as HTMLElement).getAttribute('data-ctc-pill');
+        if (ctcInput && val) {
+          ctcInput.value = val;
+          document.querySelectorAll('[data-ctc-pill]').forEach(b => {
+            b.classList.remove('bg-teal-700', 'text-white', 'border-teal-700');
+            b.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+          });
+          (e.currentTarget as HTMLElement).classList.add('bg-teal-700', 'text-white', 'border-teal-700');
+          (e.currentTarget as HTMLElement).classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+          recompute();
+        }
+      });
+    });
+
+    document.querySelectorAll('input[name="regime-toggle"]').forEach(r => {
+      r.addEventListener('change', recompute);
+    });
+
+    stateSelect?.addEventListener('change', recompute);
+    basicSelect?.addEventListener('change', recompute);
+    epfCapCheckbox?.addEventListener('change', recompute);
+    sec80cInput?.addEventListener('input', recompute);
+    sec80dInput?.addEventListener('input', recompute);
+    hraInput?.addEventListener('input', recompute);
+
+    printBtn?.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // Run on mount
+  initCalculator();
+</script>

@@ -1,0 +1,209 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { calculateSalaryBreakdown } from '../../lib/math/salary.js';
+import { formatINR } from '../../lib/format.js';
+
+const initialCurrentCtc = 1000000;
+const initialHikePct = 25;
+const initialNewCtc = Math.round(initialCurrentCtc * (1 + initialHikePct / 100));
+
+const oldData = calculateSalaryBreakdown({ ctc: initialCurrentCtc, basicPercent: 50, state: 'gujarat', regime: 'new' });
+const newData = calculateSalaryBreakdown({ ctc: initialNewCtc, basicPercent: 50, state: 'gujarat', regime: 'new' });
+const monthlyGain = newData.monthlyTakeHome - oldData.monthlyTakeHome;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Salary Hike & Increment Calculator",
+  "url": "https://salary.shivrajsinh.in/tools/salary-hike/",
+  "description": "Calculate how much extra take-home pay you get after a job switch or appraisal percentage increment.",
+  "applicationCategory": "FinanceApplication"
+};
+---
+<Layout
+  title="Salary Hike / Increment Calculator — Calculate In-Hand Pay Jump | InHand."
+  description="Got a 20%, 30%, or 50% salary hike? Calculate your exact new in-hand monthly salary, tax bracket jump, and net extra cash after deductions."
+  canonicalUrl="https://salary.shivrajsinh.in/tools/salary-hike/"
+  schemaJson={schema}
+>
+  <div class="container">
+    <nav class="text-xs text-slate-500 mb-4 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-teal-700">Home</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">Salary Hike Calculator</span>
+    </nav>
+
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-800 mb-3 border border-indigo-200/50">
+        💼 Job Switch & Annual Appraisal Evaluator
+      </div>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        Salary Hike & Increment Calculator
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+        A 30% CTC hike doesn't mean 30% more in-hand cash due to progressive tax slabs. Find out exactly how much extra money lands in your bank account every month.
+      </p>
+    </div>
+
+    <!-- Top AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 my-8">
+      <!-- Left: Inputs -->
+      <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+        <!-- Current CTC -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label for="hike-current-input" class="text-sm font-bold text-slate-900">Current Annual CTC</label>
+            <span id="hike-current-label" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 tnum">₹10 Lakh</span>
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 font-semibold pointer-events-none">₹</span>
+            <input 
+              type="number" 
+              id="hike-current-input" 
+              value={initialCurrentCtc} 
+              step="50000"
+              class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 text-lg font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 tnum bg-slate-50/50"
+            />
+          </div>
+        </div>
+
+        <!-- Hike Percentage Slider -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label for="hike-percent-input" class="text-sm font-bold text-slate-900">Hike Percentage (%)</label>
+            <span id="hike-percent-label" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 tnum">+25% Hike</span>
+          </div>
+          <input type="range" id="hike-percent-slider" min="5" max="100" step="1" value={initialHikePct} class="w-full" />
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-medium tnum">
+            <span>+10% (Normal)</span>
+            <span>+25% (Good)</span>
+            <span>+40% (Switch)</span>
+            <span>+70%+ (Double)</span>
+          </div>
+        </div>
+
+        <!-- Or Offer CTC Direct Input -->
+        <div class="pt-4 border-t border-slate-100">
+          <label for="hike-offer-input" class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+            Or Enter Offered CTC Directly:
+          </label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 font-semibold pointer-events-none">₹</span>
+            <input 
+              type="number" 
+              id="hike-offer-input" 
+              value={initialNewCtc} 
+              step="50000"
+              class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-slate-200 text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 tnum bg-white"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Increment Results -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-slate-900 text-white rounded-2xl p-7 shadow-lg border border-slate-800 relative overflow-hidden">
+          <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">Extra In-Hand Cash</div>
+          <div class="flex items-baseline gap-2">
+            <span id="hike-gain-display" class="text-4xl sm:text-5xl font-extrabold text-emerald-400 tracking-tight tnum">
+              + {formatINR(monthlyGain)}
+            </span>
+            <span class="text-sm text-slate-400">/ month</span>
+          </div>
+
+          <p class="text-xs text-slate-400 mt-2">
+            Annual take-home increases by <strong id="hike-annual-gain-display" class="text-white tnum">{formatINR(monthlyGain * 12)}</strong>
+          </p>
+
+          <div class="mt-6 pt-5 border-t border-slate-800 space-y-3 text-xs">
+            <div class="flex justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">Current Monthly In-Hand</span>
+              <strong id="hike-old-inhand-display" class="text-slate-200 tnum">{formatINR(oldData.monthlyTakeHome)}</strong>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800">
+              <span class="text-slate-400">New Monthly In-Hand</span>
+              <strong id="hike-new-inhand-display" class="text-emerald-300 font-bold tnum">{formatINR(newData.monthlyTakeHome)}</strong>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-400">New Offered CTC</span>
+              <strong id="hike-new-ctc-display" class="text-white tnum">{formatINR(initialNewCtc)}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2">
+          <h3 class="font-bold text-slate-900 text-sm">💡 Offer Negotiation Advice</h3>
+          <p>• <strong>Watch the 15L bracket:</strong> Jumps crossing ₹15 Lakhs enter the 30% tax slab under the New Regime. Ask for tax-exempt allowances or joining bonus.</p>
+          <p>• <strong>Variable vs Fixed:</strong> Ensure the hike is on Fixed Base rather than variable performance incentives.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>
+
+<script>
+  import { calculateSalaryBreakdown } from '../../lib/math/salary.js';
+  import { formatINR } from '../../lib/format.js';
+
+  function initHikeCalc() {
+    const currentInput = document.getElementById('hike-current-input') as HTMLInputElement;
+    const currentLabel = document.getElementById('hike-current-label');
+    const percentSlider = document.getElementById('hike-percent-slider') as HTMLInputElement;
+    const percentLabel = document.getElementById('hike-percent-label');
+    const offerInput = document.getElementById('hike-offer-input') as HTMLInputElement;
+
+    const gainDisp = document.getElementById('hike-gain-display');
+    const annualGainDisp = document.getElementById('hike-annual-gain-display');
+    const oldInhandDisp = document.getElementById('hike-old-inhand-display');
+    const newInhandDisp = document.getElementById('hike-new-inhand-display');
+    const newCtcDisp = document.getElementById('hike-new-ctc-display');
+
+    function updateFromPercent() {
+      const cur = Number(currentInput?.value) || 1000000;
+      const pct = Number(percentSlider?.value) || 20;
+      const newCtc = Math.round(cur * (1 + pct / 100));
+
+      if (currentLabel) currentLabel.textContent = `₹${(cur / 100000).toFixed(1)} Lakh`;
+      if (percentLabel) percentLabel.textContent = `+${pct}% Hike`;
+      if (offerInput) offerInput.value = String(newCtc);
+
+      calculateBoth(cur, newCtc);
+    }
+
+    function updateFromOffer() {
+      const cur = Number(currentInput?.value) || 1000000;
+      const newCtc = Number(offerInput?.value) || cur;
+      const pct = Math.round(((newCtc - cur) / cur) * 100);
+
+      if (currentLabel) currentLabel.textContent = `₹${(cur / 100000).toFixed(1)} Lakh`;
+      if (percentLabel) percentLabel.textContent = `+${pct}% Hike`;
+      if (percentSlider) percentSlider.value = String(Math.max(0, Math.min(100, pct)));
+
+      calculateBoth(cur, newCtc);
+    }
+
+    function calculateBoth(cur: number, newCtc: number) {
+      const oldRes = calculateSalaryBreakdown({ ctc: cur, basicPercent: 50, state: 'gujarat', regime: 'new' });
+      const newRes = calculateSalaryBreakdown({ ctc: newCtc, basicPercent: 50, state: 'gujarat', regime: 'new' });
+      const monthlyGain = newRes.monthlyTakeHome - oldRes.monthlyTakeHome;
+
+      if (gainDisp) gainDisp.textContent = `+ ${formatINR(monthlyGain)}`;
+      if (annualGainDisp) annualGainDisp.textContent = formatINR(monthlyGain * 12);
+      if (oldInhandDisp) oldInhandDisp.textContent = formatINR(oldRes.monthlyTakeHome);
+      if (newInhandDisp) newInhandDisp.textContent = formatINR(newRes.monthlyTakeHome);
+      if (newCtcDisp) newCtcDisp.textContent = formatINR(newCtc);
+    }
+
+    currentInput?.addEventListener('input', updateFromPercent);
+    percentSlider?.addEventListener('input', updateFromPercent);
+    offerInput?.addEventListener('input', updateFromOffer);
+  }
+
+  initHikeCalc();
+</script>

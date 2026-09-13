@@ -1,0 +1,187 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import HubBridges from '../../components/HubBridges.astro';
+import { TAX_QUERY_SLABS } from '../../data/taxes.data.mjs';
+import { calculateNewRegimeTax, calculateOldRegimeTax } from '../../lib/math/tax.js';
+import { formatINR } from '../../lib/format.js';
+
+export function getStaticPaths() {
+  return TAX_QUERY_SLABS.map((slab) => ({
+    params: { slug: slab.slug },
+    props: { slab }
+  }));
+}
+
+const { slab } = Astro.props;
+const newTax = calculateNewRegimeTax(slab.income);
+const oldTax = calculateOldRegimeTax(slab.income);
+const taxDiff = oldTax.totalTax - newTax.totalTax;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `How much income tax on ${slab.label} salary under New Tax Regime?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Under the New Tax Regime, total tax on ${slab.label} salary is ₹${newTax.totalTax.toLocaleString('en-IN')} (including standard deduction of ₹75,000 and 4% cess).`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `Is ${slab.label} salary tax-free?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": slab.income <= 775000 
+          ? `Yes, with standard deduction of ₹75,000 and Section 87A rebate, tax on ${slab.label} is ₹0.` 
+          : `No, tax on ${slab.label} is ₹${newTax.totalTax.toLocaleString('en-IN')} under New Regime.`
+      }
+    }
+  ]
+};
+---
+<Layout
+  title={`Income Tax on ${slab.label} Salary (FY 2025–26 & 2026–27) — InHand.`}
+  description={`How much tax do you pay on ${slab.label} salary? Exact New vs Old Tax Regime calculation, standard deduction, tax slab rates, and monthly TDS.`}
+  canonicalUrl={`https://salary.shivrajsinh.in/income-tax/${slab.slug}/`}
+  schemaJson={schema}
+>
+  <div class="container">
+    <nav class="text-xs text-slate-500 mb-4 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-teal-700">Home</a>
+      <span>/</span>
+      <a href="/income-tax/" class="hover:text-teal-700">Income Tax</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">{slab.label}</span>
+    </nav>
+
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 mb-3 border border-teal-200/50">
+        FY 2025–26 & FY 2026–27 Tax Slabs
+      </div>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        Income Tax on {slab.label} Salary (New vs Old Regime)
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+        Complete tax ledger, deduction breakdown, and monthly TDS computation for an annual income of {formatINR(slab.income)}.
+      </p>
+    </div>
+
+    <!-- Top AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <!-- Core Tax Summary Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 my-8">
+      <div class="lg:col-span-6 bg-slate-900 text-white rounded-2xl p-7 shadow-lg border border-slate-800">
+        <div class="flex items-center justify-between text-xs font-semibold text-teal-400 uppercase tracking-wider mb-2">
+          <span>New Tax Regime</span>
+          <span class="px-2 py-0.5 rounded bg-teal-900 text-teal-300">Recommended</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight tnum">
+            {formatINR(newTax.totalTax)}
+          </span>
+          <span class="text-sm text-slate-400">total tax</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">
+          Monthly TDS deduction: <strong class="text-white tnum">{formatINR(newTax.monthlyTax)}/mo</strong>
+        </p>
+
+        <div class="mt-6 pt-5 border-t border-slate-800 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-slate-400">Standard Deduction §16(ia)</span>
+            <span class="text-teal-400 font-semibold tnum">− ₹75,000</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Taxable Income</span>
+            <span class="text-white font-semibold tnum">{formatINR(newTax.taxableIncome)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Rebate u/s 87A</span>
+            <span class="text-emerald-400 font-semibold tnum">{newTax.rebate87A > 0 ? `− ${formatINR(newTax.rebate87A)}` : '₹0'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Health & Education Cess (4%)</span>
+            <span class="text-white tnum">{formatINR(newTax.healthEducationCess)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-7 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            <span>Old Tax Regime</span>
+            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">Without Deductions</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight tnum">
+              {formatINR(oldTax.totalTax)}
+            </span>
+            <span class="text-sm text-slate-500">total tax</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2">
+            Monthly TDS deduction: <strong class="text-slate-800 tnum">{formatINR(oldTax.monthlyTax)}/mo</strong>
+          </p>
+        </div>
+
+        <div class="mt-6 p-4 rounded-xl bg-teal-50 border border-teal-200/60 text-xs text-teal-900">
+          <span class="font-bold block mb-1">Tax Savings Verdict:</span>
+          {taxDiff >= 0 
+            ? `Choosing the New Tax Regime saves you ${formatINR(taxDiff)} annually on a ${slab.label} income!` 
+            : `Old Regime saves you ${formatINR(Math.abs(taxDiff))} if you have sufficient itemized deductions.`}
+        </div>
+      </div>
+    </div>
+
+    <!-- Slabs Breakdown Table -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm my-8">
+      <h2 class="text-lg font-bold text-slate-900 mb-4">Slab-wise Tax Computation (New Regime)</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-50 text-slate-700 uppercase font-bold border-b border-slate-200">
+            <tr>
+              <th class="py-2.5 px-4">Slab Bracket</th>
+              <th class="py-2.5 px-4">Tax Rate</th>
+              <th class="py-2.5 px-4 text-right">Taxable in Bracket</th>
+              <th class="py-2.5 px-4 text-right">Tax Amount</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {newTax.slabBreakdown.map(s => (
+              <tr>
+                <td class="py-2 px-4 font-medium">{s.label}</td>
+                <td class="py-2 px-4 font-semibold text-teal-700">{s.rate}</td>
+                <td class="py-2 px-4 text-right text-slate-600 tnum">{formatINR(s.taxableAmount)}</td>
+                <td class="py-2 px-4 text-right font-bold text-slate-900 tnum">{formatINR(s.tax)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Hub Bridges -->
+    <HubBridges monthlyInHand={Math.round((slab.income - newTax.totalTax) / 12)} />
+
+    <!-- Other Tax Queries -->
+    <section class="my-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-900 mb-3">Check income tax for other salary levels:</h3>
+      <div class="flex flex-wrap gap-2">
+        {TAX_QUERY_SLABS.map(other => (
+          <a
+            href={`/income-tax/${other.slug}/`}
+            class={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${other.slug === slab.slug ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-slate-700 border-slate-200 hover:border-teal-500'}`}
+          >
+            {other.label} Tax
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>

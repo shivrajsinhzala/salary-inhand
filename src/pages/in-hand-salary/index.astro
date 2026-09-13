@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { POPULAR_SLABS } from '../../data/salaries.data.mjs';
+import { calculateSalaryBreakdown } from '../../lib/math/salary.js';
+import { formatINR } from '../../lib/format.js';
+
+const slabsWithData = POPULAR_SLABS.map(s => {
+  const res = calculateSalaryBreakdown({ ctc: s.ctc, basicPercent: 50, state: 'gujarat', regime: 'new' });
+  return {
+    ...s,
+    monthlyInHand: res.monthlyTakeHome,
+    annualTax: res.annualTax
+  };
+});
+---
+<Layout
+  title="In-Hand Salary by CTC Directory (3 LPA to 2 Crore) — InHand."
+  description="Explore full in-hand salary calculations across all Indian compensation tiers from 3 LPA to 2 Crore. Compare monthly take-home, PF deductions, and income tax."
+  canonicalUrl="https://salary.shivrajsinh.in/in-hand-salary/"
+>
+  <div class="container">
+    <div class="mb-8">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        In-Hand Salary Directory by Annual CTC
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+        Complete monthly take-home salary audit sheets across 40+ compensation packages under the New Tax Regime (FY 2025–26 & FY 2026–27).
+      </p>
+    </div>
+
+    <!-- Top AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm my-8">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-5">CTC Package</th>
+              <th class="py-3 px-5">Annual CTC</th>
+              <th class="py-3 px-5 text-right">Est. Monthly In-Hand</th>
+              <th class="py-3 px-5 text-right">Annual Income Tax</th>
+              <th class="py-3 px-5 text-center">Audit Sheet</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {slabsWithData.map(slab => (
+              <tr class="hover:bg-slate-50/70 transition-colors">
+                <td class="py-3 px-5 font-bold text-slate-900">
+                  <a href={`/in-hand-salary/${slab.slug}/`} class="text-teal-700 hover:underline">
+                    {slab.label} In-Hand Salary
+                  </a>
+                </td>
+                <td class="py-3 px-5 text-slate-600 tnum">{formatINR(slab.ctc)}</td>
+                <td class="py-3 px-5 text-right font-extrabold text-emerald-700 tnum">{formatINR(slab.monthlyInHand)} / mo</td>
+                <td class="py-3 px-5 text-right text-slate-600 tnum">{slab.annualTax === 0 ? <span class="text-emerald-600 font-semibold">₹0 (Zero Tax)</span> : formatINR(slab.annualTax)}</td>
+                <td class="py-3 px-5 text-center">
+                  <a href={`/in-hand-salary/${slab.slug}/`} class="inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-teal-600 hover:text-white transition-colors">
+                    View Sheet →
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>

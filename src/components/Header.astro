@@ -1,0 +1,51 @@
+---
+const currentPath = Astro.url.pathname;
+---
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+  <div class="container flex items-center justify-between h-16">
+    <div class="flex items-center gap-6">
+      <a href="/" class="flex items-center gap-1.5 text-xl font-extrabold tracking-tight text-slate-900 group">
+        <span>InHand</span><span class="text-teal-600 group-hover:translate-x-0.5 transition-transform">.</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-1">
+        <a 
+          href="/" 
+          class={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPath === '/' ? 'bg-slate-100 text-teal-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+        >
+          Salary Calculator
+        </a>
+        <a 
+          href="/in-hand-salary/" 
+          class={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPath.startsWith('/in-hand-salary') ? 'bg-slate-100 text-teal-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+        >
+          All Slabs
+        </a>
+        <a 
+          href="/tools/home-loan-emi/" 
+          class={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPath.startsWith('/tools/home-loan-emi') ? 'bg-slate-100 text-teal-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+        >
+          Loan EMI
+        </a>
+        <a 
+          href="/tools/sip-calculator/" 
+          class={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPath.startsWith('/tools/sip-calculator') ? 'bg-slate-100 text-teal-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+        >
+          Step-Up SIP
+        </a>
+        <a 
+          href="/tools/salary-hike/" 
+          class={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPath.startsWith('/tools/salary-hike') ? 'bg-slate-100 text-teal-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+        >
+          Salary Hike
+        </a>
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
+        <span class="w-1.5 h-1.5 rounded-full bg-teal-600 animate-pulse"></span>
+        FY 2025–26 & 2026–27
+      </span>
+    </div>
+  </div>
+</header>

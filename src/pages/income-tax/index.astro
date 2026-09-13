@@ -1,0 +1,78 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { TAX_QUERY_SLABS } from '../../data/taxes.data.mjs';
+import { calculateNewRegimeTax, calculateOldRegimeTax } from '../../lib/math/tax.js';
+import { formatINR } from '../../lib/format.js';
+
+const taxRows = TAX_QUERY_SLABS.map(s => {
+  const newTax = calculateNewRegimeTax(s.income);
+  const oldTax = calculateOldRegimeTax(s.income);
+  return {
+    ...s,
+    newTax: newTax.totalTax,
+    oldTax: oldTax.totalTax,
+    monthlyTds: newTax.monthlyTax,
+    savings: oldTax.totalTax - newTax.totalTax
+  };
+});
+---
+<Layout
+  title="Income Tax Directory by Salary (₹5 Lakh to ₹50 Lakh) — InHand."
+  description="Compare New vs Old Tax Regime liability, slab breakdowns, and monthly TDS deductions across all major income brackets from ₹5 Lakh to ₹50 Lakh."
+  canonicalUrl="https://salary.shivrajsinh.in/income-tax/"
+>
+  <div class="container">
+    <div class="mb-8">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        Income Tax Directory by Annual Salary
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+        Compare New Tax Regime vs Old Tax Regime tax liability, slab tax, and monthly TDS across 20+ salary brackets.
+      </p>
+    </div>
+
+    <!-- Top AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm my-8">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="py-3 px-5">Annual Salary</th>
+              <th class="py-3 px-5 text-right">New Regime Tax</th>
+              <th class="py-3 px-5 text-right">Old Regime Tax</th>
+              <th class="py-3 px-5 text-right">Monthly TDS (New)</th>
+              <th class="py-3 px-5 text-center">Tax Ledger</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {taxRows.map(row => (
+              <tr class="hover:bg-slate-50/70 transition-colors">
+                <td class="py-3 px-5 font-bold text-slate-900">
+                  <a href={`/income-tax/${row.slug}/`} class="text-teal-700 hover:underline">
+                    Income Tax on {row.label}
+                  </a>
+                </td>
+                <td class="py-3 px-5 text-right font-extrabold text-slate-900 tnum">
+                  {row.newTax === 0 ? <span class="text-emerald-600">₹0 (Nil)</span> : formatINR(row.newTax)}
+                </td>
+                <td class="py-3 px-5 text-right text-slate-600 tnum">{formatINR(row.oldTax)}</td>
+                <td class="py-3 px-5 text-right font-medium text-rose-600 tnum">{formatINR(row.monthlyTds)} / mo</td>
+                <td class="py-3 px-5 text-center">
+                  <a href={`/income-tax/${row.slug}/`} class="inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-teal-600 hover:text-white transition-colors">
+                    View Ledger →
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>

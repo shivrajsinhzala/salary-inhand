@@ -1,0 +1,237 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { calculateEMI, calculatePrepaymentSavings } from '../../lib/math/emi.js';
+import { formatINR } from '../../lib/format.js';
+
+const initialLoan = 5000000;
+const initialRate = 8.5;
+const initialTenure = 20;
+const initialExtra = 5000;
+
+const baseData = calculateEMI(initialLoan, initialRate, initialTenure);
+const prepayData = calculatePrepaymentSavings(initialLoan, initialRate, initialTenure, initialExtra);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Home Loan EMI & Prepayment Calculator",
+  "url": "https://salary.shivrajsinh.in/tools/home-loan-emi/",
+  "description": "Calculate monthly home loan EMI and see how extra monthly prepayments save lakhs in interest and reduce loan tenure.",
+  "applicationCategory": "FinanceApplication"
+};
+---
+<Layout
+  title="Home Loan EMI & Prepayment Calculator — Save Lakhs in Interest | InHand."
+  description="Calculate your home loan EMI and discover how prepaying an extra ₹2,000 to ₹10,000 per month can save you over ₹10 Lakhs in interest and cut years off your loan tenure."
+  canonicalUrl="https://salary.shivrajsinh.in/tools/home-loan-emi/"
+  schemaJson={schema}
+>
+  <div class="container">
+    <nav class="text-xs text-slate-500 mb-4 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-teal-700">Home</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">Home Loan EMI & Prepayment</span>
+    </nav>
+
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-800 mb-3 border border-teal-200/50">
+        💡 The Secret Banks Don't Show You: Prepayment Savings
+      </div>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        Home Loan EMI & Prepayment Savings Calculator
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+        Standard bank calculators only show your monthly EMI. This tool reveals how paying just a little extra each month saves lakhs in interest and finishes your loan years early.
+      </p>
+    </div>
+
+    <!-- Top AdSlot (High-value banking ads) -->
+    <AdSlot format="horizontal" />
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 my-8">
+      <!-- Left: Inputs -->
+      <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+        <!-- Loan Amount -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label for="emi-loan-input" class="text-sm font-bold text-slate-900">Loan Amount</label>
+            <span id="emi-loan-label" class="text-xs font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-800 tnum">
+              ₹50 Lakh
+            </span>
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 font-semibold pointer-events-none">₹</span>
+            <input 
+              type="number" 
+              id="emi-loan-input" 
+              value={initialLoan} 
+              step="50000"
+              class="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 text-lg font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 tnum bg-slate-50/50"
+            />
+          </div>
+          <input type="range" id="emi-loan-slider" min="500000" max="20000000" step="100000" value={initialLoan} class="w-full mt-3" />
+        </div>
+
+        <!-- Interest Rate -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label for="emi-rate-input" class="text-sm font-bold text-slate-900">Interest Rate (% p.a.)</label>
+            <span id="emi-rate-label" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 tnum">8.5%</span>
+          </div>
+          <input 
+            type="number" 
+            id="emi-rate-input" 
+            value={initialRate} 
+            step="0.1" 
+            min="6" 
+            max="18"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 tnum bg-slate-50/50"
+          />
+          <input type="range" id="emi-rate-slider" min="6.5" max="15" step="0.1" value={initialRate} class="w-full mt-3" />
+        </div>
+
+        <!-- Loan Tenure -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label for="emi-tenure-input" class="text-sm font-bold text-slate-900">Tenure (Years)</label>
+            <span id="emi-tenure-label" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 tnum">20 Years</span>
+          </div>
+          <input type="range" id="emi-tenure-slider" min="5" max="30" step="1" value={initialTenure} class="w-full" />
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-medium tnum">
+            <span>5 Years</span>
+            <span>15 Years</span>
+            <span>20 Years</span>
+            <span>30 Years</span>
+          </div>
+        </div>
+
+        <!-- Prepayment Booster Input -->
+        <div class="pt-5 border-t border-slate-100 bg-teal-50/40 p-4 rounded-xl border border-teal-100">
+          <div class="flex justify-between items-center mb-2">
+            <label for="emi-extra-input" class="text-sm font-bold text-teal-950 flex items-center gap-1.5">
+              <span>⚡ Extra Prepayment per Month</span>
+            </label>
+            <span id="emi-extra-label" class="text-xs font-bold px-2 py-0.5 rounded bg-teal-600 text-white tnum">+ ₹5,000/mo</span>
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-slate-400 font-semibold pointer-events-none">₹</span>
+            <input 
+              type="number" 
+              id="emi-extra-input" 
+              value={initialExtra} 
+              step="1000"
+              class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-teal-200 text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 tnum bg-white"
+            />
+          </div>
+          <p class="text-[11px] text-teal-800/80 mt-2">
+            Paying just ₹3,000 to ₹5,000 extra directly towards principal reduces the compounding interest drastically.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Results Card -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-slate-900 text-white rounded-2xl p-7 shadow-lg border border-slate-800 relative overflow-hidden">
+          <div class="text-xs font-semibold text-teal-400 uppercase tracking-wider mb-2">Monthly EMI Payable</div>
+          <div class="flex items-baseline gap-2">
+            <span id="emi-display" class="text-4xl sm:text-5xl font-extrabold text-white tracking-tight tnum">
+              {formatINR(baseData.emi)}
+            </span>
+            <span class="text-sm text-slate-400">/ month</span>
+          </div>
+
+          <div class="mt-6 pt-5 border-t border-slate-800 grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <span class="text-slate-400 block">Total Interest (Base)</span>
+              <strong id="total-interest-display" class="text-sm font-bold text-slate-200 block mt-0.5 tnum">{formatINR(baseData.totalInterest)}</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block">Total Payment (P + I)</span>
+              <strong id="total-payment-display" class="text-sm font-bold text-slate-200 block mt-0.5 tnum">{formatINR(baseData.totalPayment)}</strong>
+            </div>
+          </div>
+
+          <!-- Prepayment Magic Highlight Card -->
+          <div class="mt-6 p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-300 uppercase tracking-wide">
+              <span>🎯 Your Prepayment Savings</span>
+            </div>
+            <div class="mt-2 text-2xl font-extrabold text-white tnum" id="interest-saved-display">
+              Save {formatINR(prepayData.interestSaved)}
+            </div>
+            <p class="text-xs text-emerald-200/90 mt-1 leading-relaxed" id="years-saved-display">
+              Your loan ends <strong class="text-white font-bold">{prepayData.yearsSaved} years earlier</strong> ({prepayData.newTenureYears} years instead of {initialTenure} years)!
+            </p>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2">
+          <h3 class="font-bold text-slate-900 text-sm">💡 Quick Home Loan Tips</h3>
+          <p>• <strong>Tenure matters most:</strong> A 30-year loan has slightly lower EMI than a 20-year loan, but you pay more than double the total interest!</p>
+          <p>• <strong>Prepay early:</strong> Prepayments in the first 5 to 7 years have 5x more impact than prepayments in the final years.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>
+
+<script>
+  import { calculateEMI, calculatePrepaymentSavings } from '../../lib/math/emi.js';
+  import { formatINR } from '../../lib/format.js';
+
+  function initEmiCalc() {
+    const loanInput = document.getElementById('emi-loan-input') as HTMLInputElement;
+    const loanSlider = document.getElementById('emi-loan-slider') as HTMLInputElement;
+    const loanLabel = document.getElementById('emi-loan-label');
+    const rateInput = document.getElementById('emi-rate-input') as HTMLInputElement;
+    const rateSlider = document.getElementById('emi-rate-slider') as HTMLInputElement;
+    const rateLabel = document.getElementById('emi-rate-label');
+    const tenureSlider = document.getElementById('emi-tenure-slider') as HTMLInputElement;
+    const tenureLabel = document.getElementById('emi-tenure-label');
+    const extraInput = document.getElementById('emi-extra-input') as HTMLInputElement;
+    const extraLabel = document.getElementById('emi-extra-label');
+
+    const emiDisplay = document.getElementById('emi-display');
+    const interestDisplay = document.getElementById('total-interest-display');
+    const paymentDisplay = document.getElementById('total-payment-display');
+    const interestSavedDisplay = document.getElementById('interest-saved-display');
+    const yearsSavedDisplay = document.getElementById('years-saved-display');
+
+    function update() {
+      const p = Number(loanInput?.value) || 5000000;
+      const r = Number(rateInput?.value) || 8.5;
+      const t = Number(tenureSlider?.value) || 20;
+      const extra = Number(extraInput?.value) || 0;
+
+      if (loanLabel) loanLabel.textContent = `₹${(p / 100000).toFixed(1)} Lakh`;
+      if (rateLabel) rateLabel.textContent = `${r}%`;
+      if (tenureLabel) tenureLabel.textContent = `${t} Years`;
+      if (extraLabel) extraLabel.textContent = `+ ₹${extra.toLocaleString('en-IN')}/mo`;
+
+      const base = calculateEMI(p, r, t);
+      const prepay = calculatePrepaymentSavings(p, r, t, extra);
+
+      if (emiDisplay) emiDisplay.textContent = formatINR(base.emi);
+      if (interestDisplay) interestDisplay.textContent = formatINR(base.totalInterest);
+      if (paymentDisplay) paymentDisplay.textContent = formatINR(base.totalPayment);
+
+      if (interestSavedDisplay) interestSavedDisplay.textContent = `Save ${formatINR(prepay.interestSaved)}`;
+      if (yearsSavedDisplay) {
+        yearsSavedDisplay.innerHTML = `Your loan ends <strong class="text-white font-bold">${prepay.yearsSaved} years earlier</strong> (${prepay.newTenureYears} years instead of ${t} years)!`;
+      }
+    }
+
+    loanInput?.addEventListener('input', () => { if (loanSlider) loanSlider.value = loanInput.value; update(); });
+    loanSlider?.addEventListener('input', () => { if (loanInput) loanInput.value = loanSlider.value; update(); });
+    rateInput?.addEventListener('input', () => { if (rateSlider) rateSlider.value = rateInput.value; update(); });
+    rateSlider?.addEventListener('input', () => { if (rateInput) rateInput.value = rateSlider.value; update(); });
+    tenureSlider?.addEventListener('input', update);
+    extraInput?.addEventListener('input', update);
+  }
+
+  initEmiCalc();
+</script>

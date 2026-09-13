@@ -1,0 +1,154 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SalaryCalculator from '../components/SalaryCalculator.astro';
+import HubBridges from '../components/HubBridges.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { POPULAR_SLABS } from '../data/salaries.data.mjs';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "InHand — Indian In-Hand Salary & Tax Calculator",
+      "url": "https://salary.shivrajsinh.in",
+      "description": "Calculate monthly take-home salary, EPF, professional tax, and new vs old tax regime savings for FY 2025-26 & 2026-27.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the standard deduction in New Tax Regime for FY 2025-26?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The standard deduction under the New Tax Regime is ₹75,000 for salaried employees and pensioners."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is a salary of ₹7.75 Lakhs completely tax-free under the New Regime?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. A gross salary of ₹7,75,000 receives a ₹75,000 standard deduction, bringing taxable income to ₹7,00,000. Under Section 87A, taxable income up to ₹7 Lakhs receives a full rebate, resulting in ₹0 tax payable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is in-hand salary calculated from annual CTC?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Take-Home Salary = Cash Gross Salary - Employee EPF (12% of basic) - Professional Tax (₹200/mo) - Income Tax (TDS). Cash Gross is Annual CTC minus Employer EPF and Gratuity."
+          }
+        }
+      ]
+    }
+  ]
+};
+---
+<Layout 
+  title="In-Hand Salary Calculator FY 2025–26 & 2026–27 | CTC to Take-Home — InHand."
+  description="Calculate your exact monthly in-hand salary, EPF deductions, professional tax, and compare New vs Old Tax Regime savings for FY 2025–26 & FY 2026–27 in seconds."
+  canonicalUrl="https://salary.shivrajsinh.in/"
+  schemaJson={schema}
+>
+  <div class="container">
+    <!-- Top AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <!-- Core Interactive Calculator -->
+    <SalaryCalculator initialCtc={1200000} initialRegime="new" initialState="gujarat" />
+
+    <!-- Cross-Tool Bridges (Pageview Multiplier) -->
+    <HubBridges monthlyInHand={80749} />
+
+    <!-- Mid-Page AdSlot -->
+    <AdSlot format="horizontal" />
+
+    <!-- Programmatic Slabs Quick-Link Grid -->
+    <section class="my-12 p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Browse In-Hand Salary by CTC (Slabs)</h2>
+          <p class="text-xs text-slate-500">Explore pre-computed take-home salary and tax audit sheets across all common LPA packages.</p>
+        </div>
+        <a href="/in-hand-salary/" class="text-xs font-semibold text-teal-700 hover:underline">
+          View all salary slabs →
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5">
+        {POPULAR_SLABS.map(slab => (
+          <a 
+            href={`/in-hand-salary/${slab.slug}/`}
+            class="px-3 py-2 text-center rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-all text-xs font-bold text-slate-700"
+          >
+            {slab.label}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Educational & Tax Rules Guide -->
+    <section class="my-12 prose max-w-none text-slate-700 space-y-6">
+      <div class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">How In-Hand Salary Works in India (CTC vs In-Hand)</h2>
+        <p class="text-sm leading-relaxed mb-4">
+          When receiving a job offer in India, the figure mentioned on the offer letter is the <strong>Cost to Company (CTC)</strong>. However, what actually hits your bank account every month is the <strong>In-Hand (Net Take-Home) Salary</strong>.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6 text-sm">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 mb-1">1. Employer Deductions</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Included in CTC but subtracted before calculating gross: Employer PF (12% of basic) and Gratuity (approx 4.81% of basic).
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 mb-1">2. Employee Deductions</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Subtracted from your monthly gross pay: Employee PF (12% of basic) and State Professional Tax (typically ₹200/month).
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold text-slate-900 mb-1">3. Income Tax (TDS)</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Tax deducted by the employer based on your chosen regime (New vs Old) after factoring in the standard deduction and rebates.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-bold text-slate-900 mt-6 mb-3">New Tax Regime Slabs (FY 2025–26 & FY 2026–27)</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border border-slate-200 rounded-xl overflow-hidden">
+            <thead class="bg-slate-100 text-slate-800 uppercase font-bold">
+              <tr>
+                <th class="py-2.5 px-4">Income Slab</th>
+                <th class="py-2.5 px-4">Tax Rate</th>
+                <th class="py-2.5 px-4">Key Provisions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+              <tr><td class="py-2 px-4">Up to ₹3,00,000</td><td class="py-2 px-4 font-semibold text-emerald-600">Nil (0%)</td><td class="py-2 px-4">Basic Exemption Limit</td></tr>
+              <tr><td class="py-2 px-4">₹3,00,001 to ₹7,00,000</td><td class="py-2 px-4 font-semibold">5%</td><td class="py-2 px-4">100% Tax Rebate under §87A (Effective 0 tax)</td></tr>
+              <tr><td class="py-2 px-4">₹7,00,001 to ₹10,00,000</td><td class="py-2 px-4 font-semibold">10%</td><td class="py-2 px-4">Marginal relief applicable between 7L and 7.27L</td></tr>
+              <tr><td class="py-2 px-4">₹10,00,001 to ₹12,00,000</td><td class="py-2 px-4 font-semibold">15%</td><td class="py-2 px-4">Standard Deduction ₹75,000 applied first</td></tr>
+              <tr><td class="py-2 px-4">₹12,00,001 to ₹15,00,000</td><td class="py-2 px-4 font-semibold">20%</td><td class="py-2 px-4">Lower than Old Regime 30% slab</td></tr>
+              <tr><td class="py-2 px-4">Above ₹15,00,000</td><td class="py-2 px-4 font-semibold text-rose-600">30%</td><td class="py-2 px-4">+ Surcharge (if income > 50 Lakhs) + 4% Cess</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom AdSlot -->
+    <AdSlot format="horizontal" />
+  </div>
+</Layout>
