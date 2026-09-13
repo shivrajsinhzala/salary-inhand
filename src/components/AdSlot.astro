@@ -5,21 +5,28 @@ interface Props {
   className?: string;
 }
 
-const { slot = '7164999486301748', format = 'auto', className = '' } = Astro.props;
+const { slot, format = 'auto', className = '' } = Astro.props;
 const CLIENT = 'ca-pub-7164999486301748';
+// Only render manual ins tag if a genuine 10-digit ad unit slot ID is provided
+const isRealSlot = slot && /^\d{9,12}$/.test(slot) && slot !== '7164999486301748';
 ---
-<div class={`ad-slot-wrapper no-print my-6 w-full text-center ${className}`}>
-  <ins 
-    class="adsbygoogle block mx-auto text-center"
-    style="display:block"
-    data-ad-client={CLIENT}
-    data-ad-slot={slot}
-    data-ad-format={format}
-    data-full-width-responsive="true"
-  ></ins>
-  <script is:inline>
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (e) {}
-  </script>
-</div>
+{isRealSlot ? (
+  <div class={`ad-slot-wrapper no-print my-6 w-full text-center ${className}`}>
+    <ins 
+      class="adsbygoogle block mx-auto text-center"
+      style="display:block"
+      data-ad-client={CLIENT}
+      data-ad-slot={slot}
+      data-ad-format={format}
+      data-full-width-responsive="true"
+    ></ins>
+    <script is:inline>
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {}
+    </script>
+  </div>
+) : (
+  <!-- Auto Ads Placement Target -->
+  <div class={`ad-slot-container no-print my-4 w-full text-center ${className}`} data-ad-client={CLIENT}></div>
+)}
