@@ -14,11 +14,33 @@ const monthlyGain = newData.monthlyTakeHome - oldData.monthlyTakeHome;
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Salary Hike & Increment Calculator",
-  "url": "https://salary.shivrajsinh.in/tools/salary-hike/",
-  "description": "Calculate how much extra take-home pay you get after a job switch or appraisal percentage increment.",
-  "applicationCategory": "FinanceApplication"
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Salary Hike & Increment Calculator",
+      "url": "https://salary.shivrajsinh.in/tools/salary-hike/",
+      "description": "Calculate how much extra take-home pay you get after a job switch or appraisal percentage increment.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://salary.shivrajsinh.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Salary Hike Calculator",
+          "item": "https://salary.shivrajsinh.in/tools/salary-hike/"
+        }
+      ]
+    }
+  ]
 };
 ---
 <Layout
@@ -36,7 +58,10 @@ const schema = {
 
     <div class="mb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-800 mb-3 border border-indigo-200/50">
-        💼 Job Switch & Annual Appraisal Evaluator
+        <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <span>Job Switch & Annual Appraisal Evaluator</span>
       </div>
       <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
         Salary Hike & Increment Calculator
@@ -135,7 +160,12 @@ const schema = {
         </div>
 
         <div class="p-5 bg-white border border-slate-200 rounded-xl text-xs text-slate-600 space-y-2">
-          <h3 class="font-bold text-slate-900 text-sm">💡 Offer Negotiation Advice</h3>
+          <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Offer Negotiation Strategy</span>
+          </h3>
           <p>• <strong>Watch the 15L bracket:</strong> Jumps crossing ₹15 Lakhs enter the 30% tax slab under the New Regime. Ask for tax-exempt allowances or joining bonus.</p>
           <p>• <strong>Variable vs Fixed:</strong> Ensure the hike is on Fixed Base rather than variable performance incentives.</p>
         </div>

@@ -20,25 +20,60 @@ const taxDiff = oldTax.totalTax - newTax.totalTax;
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+  "@graph": [
     {
-      "@type": "Question",
-      "name": `How much income tax on ${slab.label} salary under New Tax Regime?`,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": `Under the New Tax Regime, total tax on ${slab.label} salary is ₹${newTax.totalTax.toLocaleString('en-IN')} (including standard deduction of ₹75,000 and 4% cess).`
-      }
+      "@type": "WebApplication",
+      "name": `Income Tax on ${slab.label} Calculator`,
+      "url": `https://salary.shivrajsinh.in/income-tax/${slab.slug}/`,
+      "description": `Income tax calculation, tax slabs, and TDS for ${slab.label} under New and Old Tax Regimes.`,
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any"
     },
     {
-      "@type": "Question",
-      "name": `Is ${slab.label} salary tax-free?`,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": slab.income <= 775000 
-          ? `Yes, with standard deduction of ₹75,000 and Section 87A rebate, tax on ${slab.label} is ₹0.` 
-          : `No, tax on ${slab.label} is ₹${newTax.totalTax.toLocaleString('en-IN')} under New Regime.`
-      }
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://salary.shivrajsinh.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Income Tax Directory",
+          "item": "https://salary.shivrajsinh.in/income-tax/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": `Tax on ${slab.label}`,
+          "item": `https://salary.shivrajsinh.in/income-tax/${slab.slug}/`
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": `How much income tax on ${slab.label} salary under New Tax Regime?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `Under the New Tax Regime, total tax on ${slab.label} salary is ₹${newTax.totalTax.toLocaleString('en-IN')} (including standard deduction of ₹75,000 and 4% cess).`
+          }
+        },
+        {
+          "@type": "Question",
+          "name": `Is ${slab.label} salary tax-free?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": slab.income <= 775000 
+              ? `Yes, with standard deduction of ₹75,000 and Section 87A rebate, tax on ${slab.label} is ₹0.` 
+              : `No, tax on ${slab.label} is ₹${newTax.totalTax.toLocaleString('en-IN')} under New Regime.`
+          }
+        }
+      ]
     }
   ]
 };

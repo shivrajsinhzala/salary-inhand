@@ -13,11 +13,15 @@ interface Props {
 const {
   title,
   description,
-  canonicalUrl = Astro.url.href,
+  canonicalUrl,
   schemaJson
 } = Astro.props;
 
 const siteUrl = 'https://salary.shivrajsinh.in';
+const rawPath = Astro.url.pathname;
+const cleanPath = rawPath === '/' ? '/' : (rawPath.endsWith('/') ? rawPath : `${rawPath}/`);
+const finalCanonical = canonicalUrl || `${siteUrl}${cleanPath}`;
+const ogImage = `${siteUrl}/og-image.png`;
 ---
 <!doctype html>
 <html lang="en-IN">
@@ -26,7 +30,8 @@ const siteUrl = 'https://salary.shivrajsinh.in';
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  <link rel="canonical" href={canonicalUrl} />
+  <link rel="canonical" href={finalCanonical} />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7164999486301748" crossorigin="anonymous"></script>
@@ -37,15 +42,21 @@ const siteUrl = 'https://salary.shivrajsinh.in';
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:url" content={finalCanonical} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:site_name" content="InHand." />
+  <meta property="og:locale" content="en_IN" />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="InHand Financial Calculators for India" />
 
-  <!-- Twitter -->
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
 
   <!-- Schema.org Structured Data -->
   {schemaJson && (

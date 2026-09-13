@@ -38,6 +38,29 @@ const schema = {
       }
     },
     {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://salary.shivrajsinh.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "In-Hand Salary Slabs",
+          "item": "https://salary.shivrajsinh.in/in-hand-salary/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": `${slab.label} In-Hand Salary`,
+          "item": `https://salary.shivrajsinh.in/in-hand-salary/${slab.slug}/`
+        }
+      ]
+    },
+    {
       "@type": "FAQPage",
       "mainEntity": faqs.map(f => ({
         "@type": "Question",

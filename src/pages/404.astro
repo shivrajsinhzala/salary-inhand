@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { POPULAR_SLABS } from '../data/salaries.data.mjs';
+
+const popularSlabs = POPULAR_SLABS.filter(s => s.popular).slice(0, 8);
+---
+<Layout
+  title="Page Not Found (404) — InHand."
+  description="The requested page could not be found. Explore our salary calculators, tax regime comparisons, and financial tools."
+  canonicalUrl="https://salary.shivrajsinh.in/404/"
+>
+  <div class="container max-w-3xl text-center py-16 sm:py-24">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/60 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+      Error 404
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+      Page Not Found
+    </h1>
+    <p class="text-base sm:text-lg text-slate-600 mt-4 max-w-xl mx-auto leading-relaxed">
+      The calculator or slab you are looking for may have moved or does not exist. Select from our popular tools or salary slabs below.
+    </p>
+
+    <!-- Quick Action Buttons -->
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a 
+        href="/" 
+        class="py-3 px-6 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition-colors"
+      >
+        Go to Salary Calculator
+      </a>
+      <a 
+        href="/in-hand-salary/" 
+        class="py-3 px-6 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-800 font-bold text-sm shadow-sm transition-colors"
+      >
+        View All Slabs Directory
+      </a>
+    </div>
+
+    <!-- Core Tools Grid -->
+    <div class="mt-14 text-left border-t border-slate-200 pt-10">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 text-center">
+        Explore Financial Calculators
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/tools/home-loan-emi/" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-teal-500 transition-colors group">
+          <div class="font-bold text-slate-900 group-hover:text-teal-700 text-sm">Loan EMI & Prepay</div>
+          <div class="text-xs text-slate-500 mt-1">See interest saved with prepayments</div>
+        </a>
+        <a href="/tools/sip-calculator/" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-teal-500 transition-colors group">
+          <div class="font-bold text-slate-900 group-hover:text-teal-700 text-sm">Step-Up SIP</div>
+          <div class="text-xs text-slate-500 mt-1">Compound wealth with annual raises</div>
+        </a>
+        <a href="/tools/salary-hike/" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-teal-500 transition-colors group">
+          <div class="font-bold text-slate-900 group-hover:text-teal-700 text-sm">Salary Hike</div>
+          <div class="text-xs text-slate-500 mt-1">Actual in-hand increase on job switch</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Popular Slabs -->
+    <div class="mt-10 text-left border-t border-slate-200 pt-8">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 text-center">
+        Popular Salary Take-Home Breakdowns
+      </h2>
+      <div class="flex flex-wrap justify-center gap-2">
+        {popularSlabs.map(s => (
+          <a 
+            href={`/in-hand-salary/${s.slug}/`}
+            class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-teal-500 hover:text-teal-700 text-xs font-semibold text-slate-700 transition-colors"
+          >
+            {s.label} In-Hand
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>
