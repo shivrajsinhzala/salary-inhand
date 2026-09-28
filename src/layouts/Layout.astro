@@ -2,26 +2,31 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import { SITE_URL, SITE_NAME, CONTENT_UPDATED } from '../lib/site.js';
 
 interface Props {
   title: string;
   description: string;
   canonicalUrl?: string;
   schemaJson?: object;
+  noindex?: boolean;
 }
 
 const {
   title,
   description,
   canonicalUrl,
-  schemaJson
+  schemaJson,
+  noindex = false
 } = Astro.props;
 
-const siteUrl = 'https://salary.shivrajsinh.in';
 const rawPath = Astro.url.pathname;
 const cleanPath = rawPath === '/' ? '/' : (rawPath.endsWith('/') ? rawPath : `${rawPath}/`);
-const finalCanonical = canonicalUrl || `${siteUrl}${cleanPath}`;
-const ogImage = `${siteUrl}/og-image.png`;
+const finalCanonical = canonicalUrl || `${SITE_URL}${cleanPath}`;
+const ogImage = `${SITE_URL}/og-image.png`;
+const robots = noindex
+  ? 'noindex, follow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
 ---
 <!doctype html>
 <html lang="en-IN">
@@ -31,7 +36,13 @@ const ogImage = `${siteUrl}/og-image.png`;
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={finalCanonical} />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="robots" content={robots} />
+
+  <!-- Speed up the ad handshake: DNS + TLS resolved before the async script fires -->
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+  <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin />
+  <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
 
   <!-- Canonical Domain Redirect (pages.dev -> salary.shivrajsinh.in) -->
   <script is:inline>
@@ -41,11 +52,20 @@ const ogImage = `${siteUrl}/og-image.png`;
   </script>
 
   <!-- Google AdSense -->
+  <meta name="google-adsense-account" content="ca-pub-7164999486301748" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7164999486301748" crossorigin="anonymous"></script>
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/og-image.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <meta name="theme-color" content="#0f766e" />
+  <meta name="application-name" content={SITE_NAME} />
+
+  <!-- Geo / content targeting -->
+  <meta name="author" content={SITE_NAME} />
+  <meta name="geo.region" content="IN" />
+  <meta http-equiv="content-language" content="en-IN" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -55,15 +75,18 @@ const ogImage = `${siteUrl}/og-image.png`;
   <meta property="og:site_name" content="InHand." />
   <meta property="og:locale" content="en_IN" />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="InHand Financial Calculators for India" />
+  <meta property="article:modified_time" content={CONTENT_UPDATED} />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
+  <meta name="twitter:image:alt" content="InHand Financial Calculators for India" />
 
   <!-- Schema.org Structured Data -->
   {schemaJson && (
@@ -71,8 +94,11 @@ const ogImage = `${siteUrl}/og-image.png`;
   )}
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-teal-700 focus:text-white focus:text-sm focus:font-semibold">
+    Skip to main content
+  </a>
   <Header />
-  <main class="flex-1 py-8 sm:py-10">
+  <main id="main" class="flex-1 py-8 sm:py-10">
     <slot />
   </main>
   <Footer />

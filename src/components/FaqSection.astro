@@ -1,0 +1,26 @@
+---
+/**
+ * Renders FAQs visibly. Google requires FAQPage markup to mirror on-page,
+ * user-visible content — always pair FAQPage schema with this component.
+ */
+interface Props {
+  faqs: { question: string; answer: string }[];
+  heading?: string;
+  id?: string;
+}
+
+const { faqs, heading = 'Frequently Asked Questions', id = 'faq' } = Astro.props;
+---
+{faqs.length > 0 && (
+  <section id={id} class="my-12 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+    <h2 class="text-xl font-bold text-slate-900 mb-6">{heading}</h2>
+    <div class="space-y-6 divide-y divide-slate-100">
+      {faqs.map((faq, index) => (
+        <div class={index === 0 ? '' : 'pt-5'}>
+          <h3 class="text-base font-bold text-slate-900 mb-2">{faq.question}</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">{faq.answer}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}

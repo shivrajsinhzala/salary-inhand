@@ -4,6 +4,14 @@ import AdSlot from '../../components/AdSlot.astro';
 import { TAX_QUERY_SLABS } from '../../data/taxes.data.mjs';
 import { calculateNewRegimeTax, calculateOldRegimeTax } from '../../lib/math/tax.js';
 import { formatINR } from '../../lib/format.js';
+import {
+  SITE_URL,
+  ORG_ID,
+  WEBSITE_ID,
+  CONTENT_UPDATED,
+  buildGraph,
+  breadcrumbSchema
+} from '../../lib/site.js';
 
 const taxRows = TAX_QUERY_SLABS.map(s => {
   const newTax = calculateNewRegimeTax(s.income);
@@ -16,13 +24,54 @@ const taxRows = TAX_QUERY_SLABS.map(s => {
     savings: oldTax.totalTax - newTax.totalTax
   };
 });
+
+const pageUrl = `${SITE_URL}/income-tax/`;
+
+const schema = buildGraph([
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#collection`,
+    url: pageUrl,
+    name: 'Income Tax Directory by Annual Salary',
+    description:
+      'New vs Old Tax Regime liability, slab tax and monthly TDS across Indian salary brackets from ₹5 Lakh to ₹50 Lakh.',
+    inLanguage: 'en-IN',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    dateModified: CONTENT_UPDATED,
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'Income tax by salary bracket',
+      numberOfItems: taxRows.length,
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      itemListElement: taxRows.map((row, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: `Income Tax on ${row.label} Salary`,
+        url: `${SITE_URL}/income-tax/${row.slug}/`
+      }))
+    }
+  },
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Income Tax Directory', path: '/income-tax/' }
+  ])
+]);
 ---
+
 <Layout
-  title="Income Tax Directory by Salary (₹5 Lakh to ₹50 Lakh) — InHand."
+  title="Income Tax by Salary: ₹5 Lakh to ₹50 Lakh Directory"
   description="Compare New vs Old Tax Regime liability, slab breakdowns, and monthly TDS deductions across all major income brackets from ₹5 Lakh to ₹50 Lakh."
-  canonicalUrl="https://salary.shivrajsinh.in/income-tax/"
+  canonicalUrl={pageUrl}
+  schemaJson={schema}
 >
   <div class="container">
+    <nav class="text-xs text-slate-500 mb-4 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-teal-700">Home</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">Income Tax</span>
+    </nav>
+
     <div class="mb-8">
       <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
         Income Tax Directory by Annual Salary

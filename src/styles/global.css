@@ -37,6 +37,13 @@
   box-sizing: border-box;
 }
 
+/* Tailwind preflight sets `svg,img,video { display: block }`, which outranks the
+   browser's UA rule for [hidden] — so the hidden attribute silently fails on
+   those elements. Restore it as an author-level rule. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--bg);

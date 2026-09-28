@@ -4,6 +4,14 @@ import AdSlot from '../../components/AdSlot.astro';
 import { POPULAR_SLABS } from '../../data/salaries.data.mjs';
 import { calculateSalaryBreakdown } from '../../lib/math/salary.js';
 import { formatINR } from '../../lib/format.js';
+import {
+  SITE_URL,
+  ORG_ID,
+  WEBSITE_ID,
+  CONTENT_UPDATED,
+  buildGraph,
+  breadcrumbSchema
+} from '../../lib/site.js';
 
 const slabsWithData = POPULAR_SLABS.map(s => {
   const res = calculateSalaryBreakdown({ ctc: s.ctc, basicPercent: 50, state: 'gujarat', regime: 'new' });
@@ -13,13 +21,54 @@ const slabsWithData = POPULAR_SLABS.map(s => {
     annualTax: res.annualTax
   };
 });
+
+const pageUrl = `${SITE_URL}/in-hand-salary/`;
+
+const schema = buildGraph([
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#collection`,
+    url: pageUrl,
+    name: 'In-Hand Salary Directory by Annual CTC',
+    description:
+      'Monthly take-home salary, EPF deductions and income tax across 40+ Indian CTC packages from 3 LPA to 2 Crore.',
+    inLanguage: 'en-IN',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    dateModified: CONTENT_UPDATED,
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'In-hand salary by CTC',
+      numberOfItems: slabsWithData.length,
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      itemListElement: slabsWithData.map((slab, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: `${slab.label} In-Hand Salary`,
+        url: `${SITE_URL}/in-hand-salary/${slab.slug}/`
+      }))
+    }
+  },
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'In-Hand Salary Slabs', path: '/in-hand-salary/' }
+  ])
+]);
 ---
+
 <Layout
-  title="In-Hand Salary by CTC Directory (3 LPA to 2 Crore) — InHand."
+  title="In-Hand Salary by CTC: 3 LPA to 2 Crore Directory"
   description="Explore full in-hand salary calculations across all Indian compensation tiers from 3 LPA to 2 Crore. Compare monthly take-home, PF deductions, and income tax."
-  canonicalUrl="https://salary.shivrajsinh.in/in-hand-salary/"
+  canonicalUrl={pageUrl}
+  schemaJson={schema}
 >
   <div class="container">
+    <nav class="text-xs text-slate-500 mb-4 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-teal-700">Home</a>
+      <span>/</span>
+      <span class="text-slate-800 font-semibold">In-Hand Salary</span>
+    </nav>
+
     <div class="mb-8">
       <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
         In-Hand Salary Directory by Annual CTC

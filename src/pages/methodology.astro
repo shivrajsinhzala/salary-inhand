@@ -1,10 +1,50 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import {
+  SITE_URL,
+  ORG_ID,
+  WEBSITE_ID,
+  CONTENT_UPDATED,
+  CONTENT_UPDATED_LABEL,
+  buildGraph,
+  breadcrumbSchema
+} from '../lib/site.js';
+
+const pageUrl = `${SITE_URL}/methodology/`;
+
+// AboutPage + citations are the strongest E-E-A-T signal available to a
+// YMYL finance tool: they name the statutes the numbers come from.
+const schema = buildGraph([
+  {
+    '@type': 'AboutPage',
+    '@id': `${pageUrl}#about`,
+    url: pageUrl,
+    name: 'Calculation Methodology & Statutory Sources',
+    description:
+      "Statutory basis for InHand's income tax, salary, EPF, gratuity and professional tax calculations.",
+    inLanguage: 'en-IN',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    dateModified: CONTENT_UPDATED,
+    citation: [
+      { '@type': 'Legislation', name: 'Income Tax Act, 1961 — Section 115BAC' },
+      { '@type': 'Legislation', name: 'Finance Act, 2025' },
+      { '@type': 'Legislation', name: "Employees' Provident Funds and Miscellaneous Provisions Act, 1952" },
+      { '@type': 'Legislation', name: 'Payment of Gratuity Act, 1972' },
+      { '@type': 'Legislation', name: 'Constitution of India — Article 276' }
+    ]
+  },
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Calculation Methodology', path: '/methodology/' }
+  ])
+]);
 ---
 <Layout
-  title="Calculation Methodology & Legal Sources — InHand."
+  title="Calculation Methodology & Statutory Sources"
   description="Verification and statutory methodology behind InHand's income tax, salary, EPF, and gratuity calculations."
-  canonicalUrl="https://salary.shivrajsinh.in/methodology/"
+  canonicalUrl={pageUrl}
+  schemaJson={schema}
 >
   <div class="container max-w-3xl py-8">
     <h1 class="text-3xl font-extrabold text-slate-900 mb-4">Calculation Methodology & Sources</h1>

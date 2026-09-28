@@ -3,68 +3,72 @@ import Layout from '../layouts/Layout.astro';
 import SalaryCalculator from '../components/SalaryCalculator.astro';
 import HubBridges from '../components/HubBridges.astro';
 import AdSlot from '../components/AdSlot.astro';
+import FaqSection from '../components/FaqSection.astro';
 import { POPULAR_SLABS } from '../data/salaries.data.mjs';
+import { TAX_QUERY_SLABS } from '../data/taxes.data.mjs';
+import { SITE_URL, ORG_ID, WEBSITE_ID, CONTENT_UPDATED, CONTENT_UPDATED_LABEL, buildGraph } from '../lib/site.js';
 
-const schema = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "name": "InHand",
-      "url": "https://salary.shivrajsinh.in",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://salary.shivrajsinh.in/in-hand-salary/{search_term_string}/",
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
-      "@type": "WebApplication",
-      "name": "InHand — Indian In-Hand Salary & Tax Calculator",
-      "url": "https://salary.shivrajsinh.in",
-      "description": "Calculate monthly take-home salary, EPF, professional tax, and new vs old tax regime savings for FY 2025-26 & 2026-27.",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR"
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is the standard deduction in New Tax Regime for FY 2025-26?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The standard deduction under the New Tax Regime is ₹75,000 for salaried employees and pensioners."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is a salary of ₹7.75 Lakhs completely tax-free under the New Regime?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. A gross salary of ₹7,75,000 receives a ₹75,000 standard deduction, bringing taxable income to ₹7,00,000. Under Section 87A, taxable income up to ₹7 Lakhs receives a full rebate, resulting in ₹0 tax payable."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is in-hand salary calculated from annual CTC?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Take-Home Salary = Cash Gross Salary - Employee EPF (12% of basic) - Professional Tax (₹200/mo) - Income Tax (TDS). Cash Gross is Annual CTC minus Employer EPF and Gratuity."
-          }
-        }
-      ]
+// Rendered visibly by <FaqSection> below — the schema mirrors on-page text.
+const faqs = [
+  {
+    question: 'What is the standard deduction in the New Tax Regime for FY 2025-26?',
+    answer: 'The standard deduction under the New Tax Regime is \u20B975,000 for salaried employees and pensioners, up from \u20B950,000 under the Old Regime.'
+  },
+  {
+    question: 'Is a salary of \u20B97.75 Lakhs completely tax-free under the New Regime?',
+    answer: 'Yes. A gross salary of \u20B97,75,000 receives a \u20B975,000 standard deduction, bringing taxable income to \u20B97,00,000. Under Section 87A, taxable income up to \u20B97 Lakhs receives a full rebate, resulting in \u20B90 tax payable.'
+  },
+  {
+    question: 'How is in-hand salary calculated from annual CTC?',
+    answer: 'Take-Home Salary = Cash Gross Salary \u2212 Employee EPF (12% of basic) \u2212 Professional Tax (\u20B9200/mo) \u2212 Income Tax (TDS). Cash Gross is Annual CTC minus Employer EPF and Gratuity.'
+  },
+  {
+    question: 'Why is my in-hand salary lower than the CTC on my offer letter?',
+    answer: 'CTC bundles costs your employer pays on your behalf but never deposits in your bank account \u2014 Employer PF (12% of basic) and Gratuity (approx 4.81% of basic). Those are removed first, then Employee PF, Professional Tax and TDS are deducted from your monthly gross.'
+  },
+  {
+    question: 'Should I choose the New or the Old Tax Regime?',
+    answer: 'The New Regime wins for most salaried people because of its wider slabs and \u20B975,000 standard deduction. The Old Regime only pays off if your combined 80C, 80D, HRA and home loan interest deductions exceed roughly \u20B93.75 Lakhs a year.'
+  }
+];
+
+const schema = buildGraph([
+  {
+    '@type': 'WebApplication',
+    '@id': `${SITE_URL}/#calculator`,
+    name: 'InHand \u2014 Indian In-Hand Salary & Tax Calculator',
+    url: `${SITE_URL}/`,
+    description:
+      'Calculate monthly take-home salary, EPF, professional tax, and new vs old tax regime savings for FY 2025-26 & 2026-27.',
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires JavaScript',
+    isAccessibleForFree: true,
+    inLanguage: 'en-IN',
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    dateModified: CONTENT_UPDATED,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'INR'
     }
-  ]
-};
+  },
+  {
+    '@type': 'FAQPage',
+    '@id': `${SITE_URL}/#faq`,
+    inLanguage: 'en-IN',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer }
+    }))
+  }
+]);
 ---
+
 <Layout 
-  title="In-Hand Salary Calculator FY 2025–26 & 2026–27 | CTC to Take-Home — InHand."
+  title="In-Hand Salary Calculator FY 2025–26 | CTC to Take-Home"
   description="Calculate your exact monthly in-hand salary, EPF deductions, professional tax, and compare New vs Old Tax Regime savings for FY 2025–26 & FY 2026–27 in seconds."
   canonicalUrl="https://salary.shivrajsinh.in/"
   schemaJson={schema}
@@ -157,6 +161,41 @@ const schema = {
         </div>
       </div>
     </section>
+
+    <!-- Income Tax Cluster Entry Point -->
+    <section class="my-12 p-8 bg-white border border-slate-200 rounded-2xl shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">How Much Income Tax Will You Pay?</h2>
+          <p class="text-xs text-slate-500">New vs Old Regime liability, slab-wise tax, and monthly TDS for every salary bracket.</p>
+        </div>
+        <a href="/income-tax/" class="text-xs font-semibold text-teal-700 hover:underline">
+          View all tax brackets &rarr;
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5">
+        {TAX_QUERY_SLABS.map(slab => (
+          <a
+            href={`/income-tax/${slab.slug}/`}
+            class="px-3 py-2 text-center rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-teal-50 hover:border-teal-500 hover:text-teal-800 transition-all text-xs font-bold text-slate-700"
+          >
+            Tax on {slab.label}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Visible FAQs (mirrors the FAQPage schema in <head>) -->
+    <FaqSection
+      faqs={faqs}
+      heading="In-Hand Salary & Income Tax FAQs (FY 2025\u201326)"
+    />
+
+    <p class="text-xs text-slate-400 text-center my-6">
+      Tax rules and slab rates last reviewed on <time datetime={CONTENT_UPDATED}>{CONTENT_UPDATED_LABEL}</time>.
+      See our <a href="/methodology/" class="text-teal-700 hover:underline">calculation methodology</a> for statutory sources.
+    </p>
 
     <!-- Bottom AdSlot -->
     <AdSlot format="horizontal" />

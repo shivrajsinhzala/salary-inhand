@@ -1,14 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import {
+  SITE_URL,
+  ORG_ID,
+  WEBSITE_ID,
+  CONTENT_UPDATED,
+  CONTENT_UPDATED_LABEL,
+  buildGraph,
+  breadcrumbSchema
+} from '../lib/site.js';
+
+const pageUrl = `${SITE_URL}/privacy/`;
+
+const schema = buildGraph([
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    url: pageUrl,
+    name: 'Privacy Policy',
+    description: 'Privacy policy and data protection terms for InHand (salary.shivrajsinh.in).',
+    inLanguage: 'en-IN',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    dateModified: CONTENT_UPDATED
+  },
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Privacy Policy', path: '/privacy/' }
+  ])
+]);
 ---
 <Layout
-  title="Privacy Policy — InHand."
+  title="Privacy Policy"
   description="Privacy policy and data protection terms for InHand (salary.shivrajsinh.in)."
-  canonicalUrl="https://salary.shivrajsinh.in/privacy/"
+  canonicalUrl={pageUrl}
+  schemaJson={schema}
 >
   <div class="container max-w-3xl py-8">
     <h1 class="text-3xl font-extrabold text-slate-900 mb-4">Privacy Policy</h1>
-    <p class="text-xs text-slate-400 mb-8">Last updated: September 2026</p>
+    <p class="text-xs text-slate-400 mb-8">Last updated: <time datetime={CONTENT_UPDATED}>{CONTENT_UPDATED_LABEL}</time></p>
 
     <div class="prose prose-slate text-sm space-y-5 text-slate-700 leading-relaxed">
       <p>

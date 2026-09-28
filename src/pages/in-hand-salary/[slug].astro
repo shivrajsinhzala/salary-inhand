@@ -3,10 +3,21 @@ import Layout from '../../layouts/Layout.astro';
 import SalaryCalculator from '../../components/SalaryCalculator.astro';
 import HubBridges from '../../components/HubBridges.astro';
 import AdSlot from '../../components/AdSlot.astro';
+import FaqSection from '../../components/FaqSection.astro';
 import { POPULAR_SLABS } from '../../data/salaries.data.mjs';
 import { calculateSalaryBreakdown } from '../../lib/math/salary.js';
 import { formatINR, formatLakhs } from '../../lib/format.js';
 import { getSalaryFaqs } from '../../data/faqs.data.mjs';
+import { getSlabContext, nearestTaxSlab, adjacentSlabs } from '../../lib/context.js';
+import {
+  SITE_URL,
+  ORG_ID,
+  WEBSITE_ID,
+  CONTENT_UPDATED,
+  CONTENT_UPDATED_LABEL,
+  buildGraph,
+  breadcrumbSchema
+} from '../../lib/site.js';
 
 export function getStaticPaths() {
   return POPULAR_SLABS.map((slab) => ({
@@ -21,63 +32,50 @@ const formattedCtc = formatINR(slab.ctc);
 const monthlyInHandStr = formatINR(data.monthlyTakeHome);
 const faqs = getSalaryFaqs(slab.label, formattedCtc, data.monthlyTakeHome, data.monthlyTax);
 
-const schema = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "name": `${slab.label} In-Hand Salary Calculator`,
-      "url": `https://salary.shivrajsinh.in/in-hand-salary/${slab.slug}/`,
-      "description": `Detailed take-home calculation for ${slab.label} CTC in India.`,
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR"
-      }
-    },
-    {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://salary.shivrajsinh.in/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "In-Hand Salary Slabs",
-          "item": "https://salary.shivrajsinh.in/in-hand-salary/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": `${slab.label} In-Hand Salary`,
-          "item": `https://salary.shivrajsinh.in/in-hand-salary/${slab.slug}/`
-        }
-      ]
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.question,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": f.answer
-        }
-      }))
-    }
-  ]
-};
+const pageUrl = `${SITE_URL}/in-hand-salary/${slab.slug}/`;
+const band = getSlabContext(slab);
+const taxSlab = nearestTaxSlab(slab.ctc);
+const { prev, next } = adjacentSlabs(slab.slug);
+const annualInHand = data.annualTakeHome;
+const inHandPct = ((annualInHand / slab.ctc) * 100).toFixed(1);
+
+const schema = buildGraph([
+  {
+    '@type': 'WebApplication',
+    '@id': `${pageUrl}#calculator`,
+    name: `${slab.label} In-Hand Salary Calculator`,
+    url: pageUrl,
+    description: `Detailed take-home calculation for ${slab.label} CTC in India — monthly in-hand of ${monthlyInHandStr} after EPF, professional tax and TDS.`,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any',
+    isAccessibleForFree: true,
+    inLanguage: 'en-IN',
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    dateModified: CONTENT_UPDATED,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' }
+  },
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'In-Hand Salary Slabs', path: '/in-hand-salary/' },
+    { name: `${slab.label} In-Hand Salary`, path: `/in-hand-salary/${slab.slug}/` }
+  ]),
+  {
+    '@type': 'FAQPage',
+    '@id': `${pageUrl}#faq`,
+    inLanguage: 'en-IN',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer }
+    }))
+  }
+]);
 ---
 <Layout
-  title={`${slab.label} In-Hand Salary (FY 2025–26) | Monthly Take-Home & Tax — InHand.`}
-  description={`What is the in-hand monthly salary for ${slab.label} CTC? Get the exact breakdown of take-home pay (${monthlyInHandStr}/mo), PF, Professional Tax, and New vs Old Tax Regime.`}
-  canonicalUrl={`https://salary.shivrajsinh.in/in-hand-salary/${slab.slug}/`}
+  title={`${slab.label} In-Hand Salary: ${monthlyInHandStr}/month (FY 2025–26 & FY 2026–27)`}
+  description={`${slab.label} CTC = ${monthlyInHandStr}/month in-hand (${inHandPct}% take-home). New Regime: ₹${Math.round(data.monthlyTax).toLocaleString('en-IN')}/mo tax. Full EPF, Professional Tax & TDS breakdown included.`}
+  canonicalUrl={pageUrl}
   schemaJson={schema}
 >
   <div class="container">
@@ -101,6 +99,61 @@ const schema = {
       subheading={`Detailed take-home calculation for ${formattedCtc} annual CTC. Monthly in-hand pay is approx ${monthlyInHandStr}/month after statutory deductions.`}
     />
 
+    <!-- Slab-specific editorial context (differentiates this page from sibling slabs) -->
+    <section class="my-10 bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="text-[11px] font-semibold tracking-wider text-teal-800 uppercase bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60">
+          {band.tier} package
+        </span>
+        <span class="text-[11px] font-semibold text-slate-500">
+          {inHandPct}% of CTC reaches your bank account
+        </span>
+      </div>
+
+      <h2 class="text-xl font-bold text-slate-900 mb-3">
+        What {slab.label} CTC Actually Means in Your Bank Account
+      </h2>
+
+      <p class="text-sm text-slate-600 leading-relaxed mb-4">
+        A <strong>{formattedCtc}</strong> annual package is {band.tier.toLowerCase()} compensation in India, typical of {band.audience}.
+        After removing the employer’s own contributions — Employer EPF and gratuity — and then deducting Employee EPF,
+        Professional Tax and TDS, roughly <strong>{formatINR(annualInHand)}</strong> a year reaches you as cash.
+        That works out to <strong>{monthlyInHandStr} per month</strong>, or about <strong>{inHandPct}%</strong> of the headline CTC figure.
+      </p>
+
+      <p class="text-sm text-slate-600 leading-relaxed mb-5">{band.note}</p>
+
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1">Annual CTC</div>
+          <div class="font-bold text-slate-900 tnum">{formatLakhs(slab.ctc)}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1">Monthly In-Hand</div>
+          <div class="font-bold text-teal-700 tnum">{monthlyInHandStr}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1">Annual Income Tax</div>
+          <div class="font-bold text-slate-900 tnum">{formatINR(data.annualTax)}</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-1">Monthly TDS</div>
+          <div class="font-bold text-slate-900 tnum">{formatINR(data.monthlyTax)}</div>
+        </div>
+      </div>
+
+      <!-- Cross-cluster links: salary page -> tax page -->
+      <div class="mt-6 pt-5 border-t border-slate-100 flex flex-wrap gap-3 text-sm">
+        <a href={`/income-tax/${taxSlab.slug}/`} class="font-semibold text-teal-700 hover:underline">
+          See the full income tax breakdown for {taxSlab.label} →
+        </a>
+        <span class="text-slate-300">|</span>
+        <a href="/methodology/" class="font-semibold text-slate-600 hover:text-teal-700 hover:underline">
+          How we calculate this
+        </a>
+      </div>
+    </section>
+
     <!-- Hub Bridges -->
     <HubBridges monthlyInHand={data.monthlyTakeHome} />
 
@@ -108,32 +161,35 @@ const schema = {
     <AdSlot format="horizontal" />
 
     <!-- Detailed FAQs Section for Rich Google Search Snippets -->
-    <section class="my-12 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-      <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-        <span>Frequently Asked Questions about {slab.label} CTC</span>
-      </h2>
+    <FaqSection
+      faqs={faqs}
+      heading={`Frequently Asked Questions about ${slab.label} CTC`}
+    />
 
-      <div class="space-y-6 divide-y divide-slate-100">
-        {faqs.map((faq, index) => (
-          <div class={index === 0 ? '' : 'pt-5'}>
-            <h3 class="text-base font-bold text-slate-900 mb-2">
-              {faq.question}
-            </h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              {faq.answer}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
+    <!-- Prev / Next slab navigation for crawl depth -->
+    <nav class="my-8 flex flex-col sm:flex-row gap-3" aria-label="Adjacent salary slabs">
+      {prev && (
+        <a href={`/in-hand-salary/${prev.slug}/`} class="flex-1 p-4 rounded-xl bg-white border border-slate-200 hover:border-teal-500 transition-colors group">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Previous slab</div>
+          <div class="font-bold text-slate-900 group-hover:text-teal-700 text-sm mt-0.5">← {prev.label} In-Hand Salary</div>
+        </a>
+      )}
+      {next && (
+        <a href={`/in-hand-salary/${next.slug}/`} class="flex-1 p-4 rounded-xl bg-white border border-slate-200 hover:border-teal-500 transition-colors group sm:text-right">
+          <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Next slab</div>
+          <div class="font-bold text-slate-900 group-hover:text-teal-700 text-sm mt-0.5">{next.label} In-Hand Salary →</div>
+        </a>
+      )}
+    </nav>
 
     <!-- Bottom Other Slabs Navigator -->
     <section class="my-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
-      <h3 class="text-sm font-bold text-slate-900 mb-3">Compare with other salary packages:</h3>
+      <h2 class="text-sm font-bold text-slate-900 mb-3">Compare with other salary packages:</h2>
       <div class="flex flex-wrap gap-2">
         {POPULAR_SLABS.map(other => (
           <a
             href={`/in-hand-salary/${other.slug}/`}
+            aria-current={other.slug === slab.slug ? 'page' : undefined}
             class={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${other.slug === slab.slug ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-slate-700 border-slate-200 hover:border-teal-500'}`}
           >
             {other.label}
@@ -141,6 +197,11 @@ const schema = {
         ))}
       </div>
     </section>
+
+    <p class="text-xs text-slate-400 text-center my-6">
+      Figures reviewed against Finance Act provisions on <time datetime={CONTENT_UPDATED}>{CONTENT_UPDATED_LABEL}</time>.
+      Assumes 50% basic pay and Gujarat professional tax; adjust the calculator above for your own structure.
+    </p>
 
     <!-- Bottom AdSlot -->
     <AdSlot format="horizontal" />
