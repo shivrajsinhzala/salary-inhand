@@ -98,7 +98,24 @@ const schema = buildGraph([
     </div>
 
     <!-- Top AdSlot -->
-    <AdSlot format="horizontal" />
+    <AdSlot slot="2791501592" format="horizontal" />
+
+    <!-- GEO Quick Answer Callout for Google AI Overviews & Perplexity -->
+    <div class="my-6 p-4 rounded-xl bg-teal-50/80 border border-teal-200/80 text-xs sm:text-sm text-teal-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+      <div class="space-y-1">
+        <div class="font-bold text-teal-900 flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
+          <span>Quick Tax Summary: {slab.label} Annual Income</span>
+        </div>
+        <p class="text-teal-900/90 leading-relaxed">
+          On an annual salary of <strong>{formatINR(slab.income)}</strong>, your total tax liability under the New Tax Regime is <strong class="text-teal-950 font-extrabold">{newTax.totalTax === 0 ? '₹0 (Zero Tax u/s 87A)' : formatINR(newTax.totalTax)}</strong> (effective tax rate: {effectiveRate}%), resulting in estimated monthly TDS of <strong class="text-teal-950">{formatINR(newTax.monthlyTax)}/month</strong> after the ₹75,000 standard deduction and 4% health & education cess.
+        </p>
+      </div>
+      <div class="flex-shrink-0 bg-white px-3 py-2 rounded-lg border border-teal-200 text-center w-full sm:w-auto">
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Monthly TDS</span>
+        <span class="text-sm sm:text-base font-black text-rose-600">{formatINR(newTax.monthlyTax)}</span>
+      </div>
+    </div>
 
     <!-- Core Tax Summary Card -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 my-8">
@@ -258,6 +275,6 @@ const schema = buildGraph([
     </p>
 
     <!-- Bottom AdSlot -->
-    <AdSlot format="horizontal" />
+    <AdSlot slot="6237686340" format="horizontal" />
   </div>
 </Layout>

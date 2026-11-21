@@ -3,6 +3,10 @@
  */
 
 export const POPULAR_SLABS = [
+  { ctc: 100000, slug: '1-lpa', label: '1 LPA', popular: true },
+  { ctc: 150000, slug: '1-5-lpa', label: '1.5 LPA', popular: false },
+  { ctc: 200000, slug: '2-lpa', label: '2 LPA', popular: true },
+  { ctc: 250000, slug: '2-5-lpa', label: '2.5 LPA', popular: false },
   { ctc: 300000, slug: '3-lpa', label: '3 LPA', popular: true },
   { ctc: 350000, slug: '3-5-lpa', label: '3.5 LPA', popular: false },
   { ctc: 400000, slug: '4-lpa', label: '4 LPA', popular: true },
@@ -38,11 +42,29 @@ export const POPULAR_SLABS = [
   { ctc: 4000000, slug: '40-lpa', label: '40 LPA', popular: true },
   { ctc: 4500000, slug: '45-lpa', label: '45 LPA', popular: false },
   { ctc: 5000000, slug: '50-lpa', label: '50 LPA', popular: true },
+  { ctc: 5500000, slug: '55-lpa', label: '55 LPA', popular: false },
   { ctc: 6000000, slug: '60-lpa', label: '60 LPA', popular: false },
+  { ctc: 6500000, slug: '65-lpa', label: '65 LPA', popular: false },
+  { ctc: 7000000, slug: '70-lpa', label: '70 LPA', popular: true },
   { ctc: 7500000, slug: '75-lpa', label: '75 LPA', popular: false },
+  { ctc: 8000000, slug: '80-lpa', label: '80 LPA', popular: true },
+  { ctc: 8500000, slug: '85-lpa', label: '85 LPA', popular: false },
+  { ctc: 9000000, slug: '90-lpa', label: '90 LPA', popular: true },
+  { ctc: 9500000, slug: '95-lpa', label: '95 LPA', popular: false },
   { ctc: 10000000, slug: '1-cr', label: '1 Crore', popular: true },
+  { ctc: 12000000, slug: '1-2-cr', label: '1.2 Crore', popular: true },
+  { ctc: 12500000, slug: '1-25-cr', label: '1.25 Crore', popular: false },
+  { ctc: 14000000, slug: '1-4-cr', label: '1.4 Crore', popular: false },
   { ctc: 15000000, slug: '1-5-cr', label: '1.5 Crore', popular: false },
-  { ctc: 20000000, slug: '2-cr', label: '2 Crore', popular: true }
+  { ctc: 16000000, slug: '1-6-cr', label: '1.6 Crore', popular: false },
+  { ctc: 17500000, slug: '1-75-cr', label: '1.75 Crore', popular: false },
+  { ctc: 18000000, slug: '1-8-cr', label: '1.8 Crore', popular: false },
+  { ctc: 20000000, slug: '2-cr', label: '2 Crore', popular: true },
+  { ctc: 25000000, slug: '2-5-cr', label: '2.5 Crore', popular: true },
+  { ctc: 30000000, slug: '3-cr', label: '3 Crore', popular: true },
+  { ctc: 35000000, slug: '3-5-cr', label: '3.5 Crore', popular: false },
+  { ctc: 40000000, slug: '4-cr', label: '4 Crore', popular: false },
+  { ctc: 50000000, slug: '5-cr', label: '5 Crore', popular: true }
 ];
 
 export function getSlabBySlug(slug) {

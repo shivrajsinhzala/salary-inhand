@@ -25,14 +25,22 @@ assert(fs.existsSync(sampleSalaryPath), 'Programmatic 12-lpa page must exist');
 const salary12LpaHtml = fs.readFileSync(sampleSalaryPath, 'utf-8');
 assert(salary12LpaHtml.includes('12 LPA In-Hand Salary'), '12 LPA title must match');
 assert(salary12LpaHtml.includes('schema.org'), 'Schema JSON-LD must be present');
-console.log('✅ Programmatic salary pages verified (/in-hand-salary/12-lpa/)');
+
+const sampleHighSalaryPath = path.join(distDir, 'in-hand-salary', '1-5-cr', 'index.html');
+assert(fs.existsSync(sampleHighSalaryPath), 'Programmatic 1-5-cr page must exist');
+const salary15CrHtml = fs.readFileSync(sampleHighSalaryPath, 'utf-8');
+assert(salary15CrHtml.includes('1.5 Crore In-Hand Salary'), '1.5 Crore title must match');
+console.log('✅ Programmatic salary pages verified (/in-hand-salary/12-lpa/, /in-hand-salary/1-5-cr/)');
 
 // 4. Check Programmatic Income Tax Pages
 const sampleTaxPath = path.join(distDir, 'income-tax', '10-lakh', 'index.html');
 assert(fs.existsSync(sampleTaxPath), 'Programmatic 10-lakh tax page must exist');
 const tax10LakhHtml = fs.readFileSync(sampleTaxPath, 'utf-8');
 assert(tax10LakhHtml.includes('Income Tax on ₹10 Lakh'), '10 Lakh tax title must match');
-console.log('✅ Programmatic income tax pages verified (/income-tax/10-lakh/)');
+
+const sampleHighTaxPath = path.join(distDir, 'income-tax', '1-crore', 'index.html');
+assert(fs.existsSync(sampleHighTaxPath), 'Programmatic 1-crore tax page must exist');
+console.log('✅ Programmatic income tax pages verified (/income-tax/10-lakh/, /income-tax/1-crore/)');
 
 // 5. Check Secondary Financial Tools
 assert(fs.existsSync(path.join(distDir, 'tools', 'home-loan-emi', 'index.html')), 'Loan EMI tool must exist');
@@ -46,4 +54,4 @@ assert(fs.existsSync(path.join(distDir, 'methodology', 'index.html')), 'Methodol
 assert(fs.existsSync(path.join(distDir, 'robots.txt')), 'robots.txt must exist');
 console.log('✅ Compliance pages verified (Privacy Policy, Methodology, Robots.txt)');
 
-console.log('\n🎉 ALL 68 PAGES AND INTEGRITY CHECKS PASSED!\n');
+console.log('\n🎉 ALL PAGES AND INTEGRITY CHECKS PASSED!\n');

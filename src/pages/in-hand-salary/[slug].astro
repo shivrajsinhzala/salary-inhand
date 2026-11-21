@@ -73,7 +73,7 @@ const schema = buildGraph([
 ]);
 ---
 <Layout
-  title={`${slab.label} In-Hand Salary: ${monthlyInHandStr}/month (FY 2025–26 & FY 2026–27)`}
+  title={`₹${slab.label} In-Hand Salary: ${monthlyInHandStr}/Month Take-Home (FY 2025–26 & 2026–27)`}
   description={`${slab.label} CTC = ${monthlyInHandStr}/month in-hand (${inHandPct}% take-home). New Regime: ₹${Math.round(data.monthlyTax).toLocaleString('en-IN')}/mo tax. Full EPF, Professional Tax & TDS breakdown included.`}
   canonicalUrl={pageUrl}
   schemaJson={schema}
@@ -88,7 +88,24 @@ const schema = buildGraph([
     </nav>
 
     <!-- Top AdSlot -->
-    <AdSlot format="horizontal" />
+    <AdSlot slot="2791501592" format="horizontal" />
+
+    <!-- GEO Quick Answer Callout for Google AI Overviews & Perplexity -->
+    <div class="my-4 p-4 rounded-xl bg-teal-50/80 border border-teal-200/80 text-xs sm:text-sm text-teal-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+      <div class="space-y-1">
+        <div class="font-bold text-teal-900 flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-teal-600 animate-pulse"></span>
+          <span>Quick Takeaway: {slab.label} CTC In-Hand Pay</span>
+        </div>
+        <p class="text-teal-900/90 leading-relaxed">
+          For an annual package of <strong>{formattedCtc}</strong>, your estimated monthly in-hand salary is <strong class="text-teal-950 text-sm sm:text-base font-extrabold">{monthlyInHandStr}/month</strong> (~{formatINR(annualInHand)}/year, or {inHandPct}% of CTC) under the New Tax Regime (FY 2025–26 & 2026–27), after standard deduction of ₹75,000, annual income tax of {formatINR(data.annualTax)}, and statutory EPF/PT deductions.
+        </p>
+      </div>
+      <div class="flex-shrink-0 bg-white px-3 py-2 rounded-lg border border-teal-200 text-center w-full sm:w-auto">
+        <span class="block text-[10px] uppercase font-bold text-slate-400">Monthly Credit</span>
+        <span class="text-sm sm:text-base font-black text-teal-700">{monthlyInHandStr}</span>
+      </div>
+    </div>
 
     <!-- Core Interactive Calculator preloaded with this CTC -->
     <SalaryCalculator 
@@ -158,7 +175,7 @@ const schema = buildGraph([
     <HubBridges monthlyInHand={data.monthlyTakeHome} />
 
     <!-- Mid-Page AdSlot -->
-    <AdSlot format="horizontal" />
+    <AdSlot slot="5213571252" format="horizontal" />
 
     <!-- Detailed FAQs Section for Rich Google Search Snippets -->
     <FaqSection
@@ -204,6 +221,6 @@ const schema = buildGraph([
     </p>
 
     <!-- Bottom AdSlot -->
-    <AdSlot format="horizontal" />
+    <AdSlot slot="6237686340" format="horizontal" />
   </div>
 </Layout>

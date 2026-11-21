@@ -10,7 +10,7 @@ export function getSalaryFaqs(lpaLabel, formattedCtc, monthlyInHand, monthlyTax)
     },
     {
       question: `Is ${lpaLabel} salary tax-free under the New Tax Regime?`,
-      answer: Number(lpaLabel.replace(/[^0-9.]/g, '')) <= 7.75
+      answer: monthlyTax === 0
         ? `Yes! For a CTC of ${lpaLabel}, with the standard deduction of ₹75,000 and Section 87A rebate, the effective income tax payable is ₹0 under the New Tax Regime.`
         : `No. For a CTC of ${lpaLabel}, after the standard deduction of ₹75,000, the taxable income exceeds the ₹7,00,000 threshold for Section 87A rebate, resulting in approximately ₹${(monthlyTax * 12).toLocaleString('en-IN')} annual tax.`
     },

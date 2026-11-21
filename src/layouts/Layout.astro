@@ -102,5 +102,43 @@ const robots = noindex
     <slot />
   </main>
   <Footer />
+
+  <!-- AdSense Document-Order Queue Initialization & Unfilled Collapse -->
+  <script is:inline>
+    (function() {
+      function pushAds() {
+        var ads = document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status])');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', pushAds);
+      } else {
+        pushAds();
+      }
+
+      try {
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-ad-status') {
+              var target = mutation.target;
+              if (target.getAttribute('data-ad-status') === 'unfilled') {
+                var wrapper = target.closest('.ad-slot-wrapper');
+                if (wrapper) {
+                  wrapper.style.display = 'none';
+                }
+              }
+            }
+          });
+        });
+        document.querySelectorAll('ins.adsbygoogle').forEach(function(ins) {
+          observer.observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
+        });
+      } catch (err) {}
+    })();
+  </script>
 </body>
 </html>

@@ -22,7 +22,12 @@ export const TAX_QUERY_SLABS = [
   { income: 2500000, slug: '25-lakh', label: '₹25 Lakh' },
   { income: 3000000, slug: '30-lakh', label: '₹30 Lakh' },
   { income: 4000000, slug: '40-lakh', label: '₹40 Lakh' },
-  { income: 5000000, slug: '50-lakh', label: '₹50 Lakh' }
+  { income: 5000000, slug: '50-lakh', label: '₹50 Lakh' },
+  { income: 6000000, slug: '60-lakh', label: '₹60 Lakh' },
+  { income: 7500000, slug: '75-lakh', label: '₹75 Lakh' },
+  { income: 10000000, slug: '1-crore', label: '₹1 Crore' },
+  { income: 15000000, slug: '1-5-crore', label: '₹1.5 Crore' },
+  { income: 20000000, slug: '2-crore', label: '₹2 Crore' }
 ];
 
 export function getTaxSlabBySlug(slug) {
