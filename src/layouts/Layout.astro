@@ -23,6 +23,7 @@ const {
 const rawPath = Astro.url.pathname;
 const cleanPath = rawPath === '/' ? '/' : (rawPath.endsWith('/') ? rawPath : `${rawPath}/`);
 const finalCanonical = canonicalUrl || `${SITE_URL}${cleanPath}`;
+const GA_ID = 'G-YWR88SQ5EM';
 const ogImage = `${SITE_URL}/og-image.png`;
 const robots = noindex
   ? 'noindex, follow'
@@ -54,6 +55,10 @@ const robots = noindex
   <!-- Google AdSense -->
   <meta name="google-adsense-account" content="ca-pub-7164999486301748" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7164999486301748" crossorigin="anonymous"></script>
+
+  <!-- Google Analytics 4 -->
+  <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+  <script is:inline define:vars={{ GA_ID }}>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', GA_ID);</script>
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
